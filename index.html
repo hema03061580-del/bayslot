@@ -11,6 +11,7 @@ body {
   text-align: center;
 }
 
+/* 全体 */
 .ui {
   position: relative;
   max-width: 900px;
@@ -21,47 +22,51 @@ body {
   width: 100%;
 }
 
-/* ロゴ */
+/* ✅ ロゴ（中央固定） */
 .logo {
   position: absolute;
   top: -10%;
-  let: 50%;
+  left: 50%;
   transform: translateX(-50%);
   width: 95%;
   max-width: 620px;
+  z-index: 2;
 }
 
-/* ✅ UI少し下げる */
+/* ✅ スロット（少し下） */
 .slot {
   position: absolute;
-  top: 50%;
+  top: 48%;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 8%;
 }
 
-/* リール */
+/* ✅ リール（2px小さく） */
 .reel {
-  width: 90px;
-  height: 90px;
+  width: 88px;
+  height: 88px;
   overflow: hidden;
-  background: white;
+  background: transparent;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* 中身 */
 .reel-inner {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
-/* ✅ サイズ少し小さく */
+/* ✅ 画像サイズ（2px小さく） */
 .reel-inner img {
-  width: 50px;
-  height: 60px;
+  width: 58px;
+  height: 58px;
   object-fit: contain;
-  display: block;
-  margin: 0 auto;
 }
 
 /* 回転 */
@@ -69,9 +74,10 @@ body {
   animation: spin 0.08s linear infinite;
 }
 
+/* ✅ 画像サイズと完全一致 */
 @keyframes spin {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-60px); }
+  100% { transform: translateY(-58px); }
 }
 
 /* ボタン */
@@ -81,6 +87,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: 55%;
+  max-width: 320px;
 }
 </style>
 </head>
@@ -110,7 +117,7 @@ const images = [
 
 let spinning = false;
 
-/* リール生成（高さ完全一致） */
+/* リール生成 */
 function createReel(){
   let html = "";
   for(let i=0;i<12;i++){
@@ -126,7 +133,7 @@ function createReel(){
   const index = Math.floor(Math.random()*images.length);
 
   reel.innerHTML = `
-    <div class="reel-inner" style="transform: translateY(-60px)">
+    <div class="reel-inner" style="transform: translateY(-58px)">
       <img src="${images[index]}">
       <img src="${images[index]}">
       <img src="${images[index]}">
@@ -156,13 +163,13 @@ function spinSlot(){
   setTimeout(()=>stopReel("r3"), 4200);
 }
 
-/* 停止（中央ピタ止め） */
+/* 停止（ズレ防止） */
 function stopReel(id){
   const reel = document.getElementById(id);
   const index = Math.floor(Math.random()*images.length);
 
   reel.innerHTML = `
-    <div class="reel-inner" style="transform: translateY(-60px)">
+    <div class="reel-inner" style="transform: translateY(-58px)">
       <img src="${images[index]}">
       <img src="${images[index]}">
       <img src="${images[index]}">
