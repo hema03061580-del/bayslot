@@ -26,11 +26,11 @@ body {
 /* ✅ ロゴ（大きく＆上） */
 .logo {
   position: absolute;
-  top: -12%;
+  top: -14%;
   left: 50%;
   transform: translateX(-50%);
-  width: 75%;
-  max-width: 500px;
+  width: 85%;
+  max-width: 560px;
   z-index: 2;
 }
 
@@ -54,20 +54,18 @@ body {
   justify-content: center;
 }
 
-/* 中身（ここが重要） */
+/* ✅ 中央固定（ズレ完全防止） */
 .reel-inner {
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  /* ✅ 常に中央を表示 */
-  transform: translateY(-85px);
+  transform: translateY(-65px);
 }
 
-/* 画像 */
+/* ✅ 画像（最適サイズ） */
 .reel-inner img {
-  width: 75px;
-  height: 75px;
+  width: 65px;
+  height: 65px;
   object-fit: contain;
 }
 
@@ -77,8 +75,8 @@ body {
 }
 
 @keyframes spin {
-  0% { transform: translateY(-85px); }
-  100% { transform: translateY(-160px); }
+  0% { transform: translateY(-65px); }
+  100% { transform: translateY(-130px); }
 }
 
 /* ボタン */
@@ -149,6 +147,7 @@ function spinSlot(){
     `;
   });
 
+  /* 順番停止 */
   setTimeout(()=>stopReel("r1"), 3000);
   setTimeout(()=>stopReel("r2"), 3500);
   setTimeout(()=>stopReel("r3"), 4200);
@@ -167,7 +166,6 @@ function createReel(){
 /* 停止 */
 function stopReel(id){
   const reel = document.getElementById(id);
-
   const index = Math.floor(Math.random()*images.length);
 
   reel.innerHTML = `
@@ -178,7 +176,10 @@ function stopReel(id){
     </div>
   `;
 
-  spinning = false;
+  /* 全部止まったら解除 */
+  if(id === "r3"){
+    spinning = false;
+  }
 }
 </script>
 
