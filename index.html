@@ -18,14 +18,13 @@ body {
 }
 
 .bg {
-  position: relative;
   width: 100%;
 }
 
 /* ロゴ */
 .logo {
   position: absolute;
-  top: 20%;
+  top: 30%;
   left: 50%;
   transform: translateX(-50%);
   width: 95%;
@@ -34,11 +33,11 @@ body {
 /* スロット */
 .slot {
   position: absolute;
-  top: 60%;
+  top: 65%;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 4px;
+  gap: 12px;
 }
 
 /* リール */
@@ -73,19 +72,26 @@ body {
   100% { transform: translateY(-60px); }
 }
 
-/* 🔥 ボタン（沈むだけ） */
+/* 🔥 ボタン */
 .spin-btn {
   position: absolute;
   top: 85%;
   left: 50%;
   transform: translateX(-50%);
   width: 60%;
-  transition: transform 0.1s, filter 0.1s;
+  transition: transform 0.1s, filter 0.1s, opacity 0.2s;
 }
 
+/* 押した時 */
 .spin-btn:active {
   transform: translateX(-50%) scale(0.92);
   filter: brightness(0.85);
+}
+
+/* 🔥 ロック状態（連打防止） */
+.spin-btn.lock {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 /* 紙吹雪 */
@@ -111,12 +117,12 @@ body {
   </div>
 
   <!-- ボタン -->
-  <img src="button.png" class="spin-btn" onclick="spinSlot()">
+  <img src="button.png" id="spinBtn" class="spin-btn" onclick="spinSlot()">
 
   <canvas id="confetti"></canvas>
 </div>
 
-<!-- 🎵 bet→回転→停止込み音 -->
+<!-- 🎵 まとめ音 -->
 <audio id="spinFull" src="spin_full.mp3"></audio>
 
 <script>
@@ -130,7 +136,9 @@ const jackpotIndex = 2;
 let spinning = false;
 let results = [];
 
-/* 音解放 */
+const btn = document.getElementById("spinBtn");
+
+/* 音解放（スマホ必須） */
 function unlockAudio(){
   document.querySelectorAll("audio").forEach(a=>{
     a.play().catch(()=>{});
@@ -140,7 +148,7 @@ function unlockAudio(){
 }
 document.body.addEventListener("touchstart", unlockAudio, { once: true });
 
-/* 🎵 再生 */
+/* 音再生 */
 function playSpin(){
   const audio = document.getElementById("spinFull");
   audio.currentTime = 0;
@@ -172,8 +180,12 @@ function createReel(){
 /* 回す */
 function spinSlot(){
   if(spinning) return;
+
   spinning = true;
   results = [];
+
+  // 🔥 ボタンロック
+  btn.classList.add("lock");
 
   playSpin();
 
@@ -190,11 +202,6 @@ function spinSlot(){
   setTimeout(()=>stopReel("r1"), 3000);
   setTimeout(()=>stopReel("r2"), 3500);
   setTimeout(()=>stopReel("r3"), 4200);
-
-  setTimeout(()=>{
-    checkWin();
-    spinning = false;
-  },5200);
 }
 
 /* 停止 */
@@ -209,6 +216,19 @@ function stopReel(id){
       <img src="${images[index]}">
     </div>
   `;
+
+  // 🔥 最後のリールで完全終了
+  if(results.length === 3){
+    setTimeout(()=>{
+      checkWin();
+
+      spinning = false;
+
+      // 🔥 ボタン解除
+      btn.classList.remove("lock");
+
+    },200);
+  }
 }
 
 /* 判定 */
