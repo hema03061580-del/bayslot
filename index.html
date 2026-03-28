@@ -55,6 +55,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center; /* ←これ追加 */
+  height: 100%;
 }
 
 /* 🎯 画像 */
@@ -213,12 +215,10 @@ function stopReel(id){
     : fixedIndex;
 
   reel.innerHTML = `
-    <div class="reel-inner">
-      <img src="${images[index]}">
-      <img src="${images[index]}">
-      <img src="${images[index]}">
-    </div>
-  `;
+  <div class="reel-inner">
+    <img src="${images[index]}">
+  </div>
+`;
 }
 
 /* 🎉 紙吹雪 */
