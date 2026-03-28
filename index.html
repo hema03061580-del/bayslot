@@ -24,17 +24,17 @@ body {
 /* ロゴ */
 .logo {
   position: absolute;
-  top: -12%;
+  top: -10%;
   left: 50%;
   transform: translateX(-50%);
-  width: 90%;
-  max-width: 600px;
+  width: 95%;
+  max-width: 620px;
 }
 
-/* スロット */
+/* ✅ UI少し下げる */
 .slot {
   position: absolute;
-  top: 40%;
+  top: 45%;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -47,32 +47,37 @@ body {
   height: 90px;
   overflow: hidden;
   background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-/* 画像 */
-.reel img {
-  width: 70px;
-  height: 70px;
+/* 中身 */
+.reel-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ✅ サイズ少し小さく */
+.reel-inner img {
+  width: 60px;
+  height: 60px;
   object-fit: contain;
+  display: block;
+  margin: 0 auto;
 }
 
 /* 回転 */
 .spin {
-  animation: spin 0.1s linear infinite;
+  animation: spin 0.08s linear infinite;
 }
 
 @keyframes spin {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-10px); }
+  100% { transform: translateY(-60px); }
 }
 
 /* ボタン */
 .spin-btn {
   position: absolute;
-  top: 68%;
+  top: 72%;
   left: 50%;
   transform: translateX(-50%);
   width: 55%;
@@ -87,9 +92,9 @@ body {
   <img src="logo.png" class="logo">
 
   <div class="slot">
-    <div class="reel"><img id="r1"></div>
-    <div class="reel"><img id="r2"></div>
-    <div class="reel"><img id="r3"></div>
+    <div class="reel"><div id="r1"></div></div>
+    <div class="reel"><div id="r2"></div></div>
+    <div class="reel"><div id="r3"></div></div>
   </div>
 
   <img src="button.png" class="spin-btn" onclick="spinSlot()">
@@ -105,10 +110,28 @@ const images = [
 
 let spinning = false;
 
-/* 初期表示 */
+/* リール生成（高さ完全一致） */
+function createReel(){
+  let html = "";
+  for(let i=0;i<12;i++){
+    const rand = Math.floor(Math.random()*images.length);
+    html += `<img src="${images[rand]}">`;
+  }
+  return html;
+}
+
+/* 初期表示（中央固定） */
 ["r1","r2","r3"].forEach(id=>{
-  document.getElementById(id).src =
-    images[Math.floor(Math.random()*images.length)];
+  const reel = document.getElementById(id);
+  const index = Math.floor(Math.random()*images.length);
+
+  reel.innerHTML = `
+    <div class="reel-inner" style="transform: translateY(-60px)">
+      <img src="${images[index]}">
+      <img src="${images[index]}">
+      <img src="${images[index]}">
+    </div>
+  `;
 });
 
 /* 回す */
@@ -118,27 +141,37 @@ function spinSlot(){
 
   document.getElementById("spinSE").play();
 
-  spinReel("r1",3000);
-  spinReel("r2",3500);
-  spinReel("r3",4200);
+  ["r1","r2","r3"].forEach(id=>{
+    const reel = document.getElementById(id);
+
+    reel.innerHTML = `
+      <div class="reel-inner spin">
+        ${createReel()}
+      </div>
+    `;
+  });
+
+  setTimeout(()=>stopReel("r1"), 3000);
+  setTimeout(()=>stopReel("r2"), 3500);
+  setTimeout(()=>stopReel("r3"), 4200);
 }
 
-/* 個別回転 */
-function spinReel(id, time){
-  const img = document.getElementById(id);
+/* 停止（中央ピタ止め） */
+function stopReel(id){
+  const reel = document.getElementById(id);
+  const index = Math.floor(Math.random()*images.length);
 
-  const interval = setInterval(()=>{
-    img.src = images[Math.floor(Math.random()*images.length)];
-  }, 100);
+  reel.innerHTML = `
+    <div class="reel-inner" style="transform: translateY(-60px)">
+      <img src="${images[index]}">
+      <img src="${images[index]}">
+      <img src="${images[index]}">
+    </div>
+  `;
 
-  setTimeout(()=>{
-    clearInterval(interval);
-    img.src = images[Math.floor(Math.random()*images.length)];
-
-    if(id === "r3"){
-      spinning = false;
-    }
-  }, time);
+  if(id === "r3"){
+    spinning = false;
+  }
 }
 </script>
 
