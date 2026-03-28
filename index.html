@@ -43,11 +43,11 @@ body {
 /* 🎯 リール */
 .reel {
   width: 30%;
-  height: 120px;   /* ←固定（超重要） */
+  height: 120px;
   overflow: hidden;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: center; /* ←追加 */
 }
 
 /* 🎯 中身 */
@@ -55,14 +55,14 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* ←これ追加 */
+  justify-content: center; /* ←これが超重要 */
   height: 100%;
 }
 
 /* 🎯 画像 */
 .reel-inner img {
   width: 100%;
-  height: 120px;   /* ←リールと同じにする */
+  height: 100%;
   object-fit: contain;
 }
 
