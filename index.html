@@ -24,11 +24,21 @@ body {
   display: block;
 }
 
-/* スロット位置 */
+/* ロゴ */
+.logo {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  max-width: 400px;
+}
+
+/* スロット位置（少し右へ） */
 .slot {
   position: absolute;
   top: 32%;
-  left: 16%;
+  left: 18%;
   display: flex;
   gap: 10%;
 }
@@ -39,7 +49,7 @@ body {
   height: 20vw;
   max-width: 150px;
   max-height: 150px;
-  overflow: hidden; /* ←はみ出し防止 */
+  overflow: hidden;
   background: white;
   display: flex;
   align-items: center;
@@ -52,10 +62,10 @@ body {
   flex-direction: column;
 }
 
-/* 画像 */
+/* 画像（サイズ調整ここ重要） */
 .reel-inner img {
-  width: 100%;
-  height: 100%;
+  width: 85%;
+  height: 85%;
   object-fit: contain;
 }
 
@@ -93,6 +103,7 @@ body {
 
 <div class="ui">
   <img src="ui.png" class="bg">
+  <img src="logo.png" class="logo">
 
   <div class="slot">
     <div class="reel"><div id="r1"></div></div>
@@ -119,7 +130,7 @@ const jackpotIndex = 2;
 let spinning = false;
 let results = [];
 
-/* リール生成（縦サイズ固定でズレ防止） */
+/* リール生成 */
 function createReel(){
   let html = "";
   for(let i=0;i<10;i++){
@@ -129,7 +140,7 @@ function createReel(){
   return html;
 }
 
-/* 初期表示（中央にピタッと1つだけ） */
+/* 初期表示 */
 ["r1","r2","r3"].forEach(id=>{
   const reel = document.getElementById(id);
   const index = Math.floor(Math.random()*images.length);
@@ -186,7 +197,6 @@ function stopReel(id){
 
   results.push(index);
 
-  /* ←ここ超重要：1枚だけ表示（ズレ完全防止） */
   reel.innerHTML = `
     <div class="reel-inner">
       <img src="${images[index]}">
