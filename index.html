@@ -150,8 +150,7 @@ document.body.addEventListener("touchstart", unlockAudio, { once: true });
 
 /* 音再生 */
 function playSpin(){
-  const audio = document.getElementById("spinFull");
-  audio.currentTime = 0;
+  const audio = new Audio("spin_full.mp3");
   audio.play().catch(()=>{});
 }
 
