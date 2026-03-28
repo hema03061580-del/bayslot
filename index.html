@@ -21,36 +21,33 @@ body {
 
 .bg {
   width: 100%;
-  display: block;
 }
 
-/* ロゴ（もっと上） */
+/* ロゴ（さらに上＆少し大きく） */
 .logo {
   position: absolute;
-  top: 0%;
+  top: -2%;
   left: 50%;
   transform: translateX(-50%);
-  width: 60%;
-  max-width: 420px;
+  width: 70%;
+  max-width: 480px;
   z-index: 2;
 }
 
 /* スロット */
 .slot {
   position: absolute;
-  top: 37%;
+  top: 38%;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 8%;
 }
 
-/* リール（サイズ固定） */
+/* リール */
 .reel {
-  width: 22vw;
-  height: 22vw;
-  max-width: 140px;
-  max-height: 140px;
+  width: 140px;
+  height: 120px;
   overflow: hidden;
   background: white;
 
@@ -66,16 +63,16 @@ body {
   align-items: center;
 }
 
-/* 画像（完全固定サイズ） */
+/* 画像（完全固定） */
 .reel-inner img {
   width: 120px;
   height: 120px;
   object-fit: contain;
 }
 
-/* 回転（高さと完全一致） */
+/* 回転 */
 .spin {
-  animation: spin 0.12s linear infinite;
+  animation: spin 0.1s linear infinite;
 }
 
 @keyframes spin {
@@ -91,14 +88,6 @@ body {
   transform: translateX(-50%);
   width: 55%;
   max-width: 320px;
-}
-
-/* 紙吹雪 */
-#confetti {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
 }
 </style>
 </head>
@@ -116,12 +105,9 @@ body {
   </div>
 
   <img src="button.png" class="spin-btn" onclick="spinSlot()">
-
-  <canvas id="confetti"></canvas>
 </div>
 
 <audio id="spinSE" src="spin_full.mp3"></audio>
-<audio id="winSE" src="bgm2.mp3"></audio>
 
 <script>
 const images = [
@@ -129,12 +115,9 @@ const images = [
   "face4.png","face5.png","face6.png"
 ];
 
-const jackpotIndex = 2;
-
 let spinning = false;
-let results = [];
 
-/* 初期表示（完全統一構造） */
+/* 初期表示（中央固定） */
 ["r1","r2","r3"].forEach(id=>{
   const reel = document.getElementById(id);
   const index = Math.floor(Math.random()*images.length);
@@ -148,21 +131,10 @@ let results = [];
   `;
 });
 
-/* リール生成 */
-function createReel(){
-  let html = "";
-  for(let i=0;i<10;i++){
-    const rand = Math.floor(Math.random()*images.length);
-    html += `<img src="${images[rand]}">`;
-  }
-  return html;
-}
-
 /* 回す */
 function spinSlot(){
   if(spinning) return;
   spinning = true;
-  results = [];
 
   document.getElementById("spinSE").play();
 
@@ -178,101 +150,36 @@ function spinSlot(){
     reel.querySelector(".reel-inner").classList.add("spin");
   });
 
-  setTimeout(()=>stopReel("r1"), 3000);
-  setTimeout(()=>stopReel("r2"), 3500);
-  setTimeout(()=>stopReel("r3"), 4200);
+  setTimeout(()=>stopAll(), 3000);
 }
 
-/* 停止 */
-function stopReel(id){
-  const reel = document.getElementById(id);
-  const inner = reel.querySelector(".reel-inner");
-
-  inner.classList.remove("spin");
-
-  let rand = Math.random();
-  let index;
-
-  if(rand < 0.04){
-    index = jackpotIndex;
+/* リール生成（高さ統一） */
+function createReel(){
+  let html = "";
+  for(let i=0;i<10;i++){
+    const rand = Math.floor(Math.random()*images.length);
+    html += `<img src="${images[rand]}">`;
   }
-  else if(rand < 0.12){
-    index = Math.floor(Math.random()*images.length);
-    if(index === jackpotIndex){
-      index = (index + 1) % images.length;
-    }
-  }
-  else{
-    index = Math.floor(Math.random()*images.length);
-  }
-
-  results.push(index);
-
-  reel.innerHTML = `
-    <div class="reel-inner">
-      <img src="${images[index]}">
-      <img src="${images[index]}">
-      <img src="${images[index]}">
-    </div>
-  `;
-
-  if(results.length === 3){
-    setTimeout(()=>{
-      checkWin();
-      spinning = false;
-    }, 200);
-  }
+  return html;
 }
 
-/* 紙吹雪 */
-function showConfetti(){
-  const canvas = document.getElementById("confetti");
-  const ctx = canvas.getContext("2d");
+/* 停止（完全中央固定） */
+function stopAll(){
+  ["r1","r2","r3"].forEach(id=>{
+    const reel = document.getElementById(id);
 
-  canvas.width = window.innerWidth;
-  canvas.height = 300;
+    const index = Math.floor(Math.random()*images.length);
 
-  let pieces = [];
+    reel.innerHTML = `
+      <div class="reel-inner">
+        <img src="${images[index]}">
+        <img src="${images[index]}">
+        <img src="${images[index]}">
+      </div>
+    `;
+  });
 
-  for(let i=0;i<80;i++){
-    pieces.push({
-      x: Math.random()*canvas.width,
-      y: Math.random()*canvas.height,
-      size: Math.random()*6+4,
-      speed: Math.random()*3+2
-    });
-  }
-
-  let frame = 0;
-
-  function draw(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    pieces.forEach(p=>{
-      ctx.fillStyle = `hsl(${Math.random()*360},100%,50%)`;
-      ctx.fillRect(p.x,p.y,p.size,p.size);
-      p.y += p.speed;
-    });
-
-    frame++;
-    if(frame < 60){
-      requestAnimationFrame(draw);
-    }
-  }
-
-  draw();
-}
-
-/* 判定 */
-function checkWin(){
-  if(results[0] === results[1] && results[1] === results[2]){
-
-    if(results[0] === jackpotIndex){
-      document.getElementById("winSE").play();
-    } else {
-      showConfetti();
-    }
-  }
+  spinning = false;
 }
 </script>
 
