@@ -18,7 +18,7 @@ body {
 }
 
 .bg {
-  position: relative;  /* ←これ追加 */
+  position: relative;
   width: 100%;
   top: 0%;
 }
@@ -26,23 +26,23 @@ body {
 /* ロゴ */
 .logo {
   position: absolute;
-  top: -20%;
+  top: 30%;
   left: 50%;
   transform: translateX(-50%);
   width: 95%;
 }
 
-/* 🔥 枠にピッタリ合わせる */
+/* スロット */
 .slot {
   position: absolute;
-  top: 48%; /* ←ここ超重要（枠に合わせた） */
+  top: 65%; /* ←ここだけ修正（見える位置） */
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   display: flex;
-  gap: 3px;
+  gap: 12px;
 }
 
-/* 🔥 リール（拡大） */
+/* リール */
 .reel {
   width: 95px;
   height: 62px;
@@ -52,14 +52,12 @@ body {
   justify-content: center;
 }
 
-/* 中身 */
 .reel-inner {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* 🔥 画像拡大 */
 .reel-inner img {
   width: 68px;
   height: 60px;
@@ -71,19 +69,24 @@ body {
   animation: spin 0.08s linear infinite;
 }
 
-/* 🔥 ピッタリ1コマ分 */
 @keyframes spin {
   0% { transform: translateY(0); }
   100% { transform: translateY(-60px); }
 }
 
-/* ボタン */
+/* 🔥 ボタン */
 .spin-btn {
   position: absolute;
-  top: 70%;
+  top: 85%;
   left: 50%;
   transform: translateX(-50%);
   width: 60%;
+  transition: transform 0.1s, filter 0.1s;
+}
+
+.spin-btn:active {
+  transform: translateX(-50%) scale(0.92);
+  filter: brightness(0.85);
 }
 
 /* 紙吹雪 */
@@ -108,12 +111,15 @@ body {
     <div class="reel"><div id="r3"></div></div>
   </div>
 
-  <img src="button.png" class="spin-btn" onclick="spinSlot()">
+  <!-- 🔥 ボタン -->
+  <img src="button.png" class="spin-btn" onclick="clickSpin()">
 
   <canvas id="confetti"></canvas>
 </div>
 
+<!-- 音 -->
 <audio id="spinFull" src="spin_full.mp3"></audio>
+<audio id="clickSE" src="click.mp3"></audio>
 
 <script>
 const images = [
@@ -136,10 +142,29 @@ function unlockAudio(){
 }
 document.body.addEventListener("touchstart", unlockAudio, { once: true });
 
+/* 🔥 クリック音 */
+function playClick(){
+  const audio = document.getElementById("clickSE");
+  audio.currentTime = 0;
+  audio.play().catch(()=>{});
+}
+
+/* 回転音 */
 function playSpin(){
   const audio = document.getElementById("spinFull");
   audio.currentTime = 0;
   audio.play().catch(()=>{});
+}
+
+/* 🔥 ボタン押し */
+function clickSpin(){
+  if(spinning) return;
+
+  playClick();
+
+  setTimeout(()=>{
+    spinSlot();
+  },100);
 }
 
 /* 初期表示 */
@@ -166,7 +191,6 @@ function createReel(){
 
 /* 回す */
 function spinSlot(){
-  if(spinning) return;
   spinning = true;
   results = [];
 
