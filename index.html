@@ -11,7 +11,6 @@ body {
   text-align: center;
 }
 
-/* 全体 */
 .ui {
   position: relative;
   max-width: 900px;
@@ -22,34 +21,30 @@ body {
   width: 100%;
 }
 
-/* ✅ ロゴ（中央固定） */
+/* ロゴ */
 .logo {
   position: absolute;
   top: -10%;
   left: 50%;
   transform: translateX(-50%);
   width: 95%;
-  max-width: 620px;
-  z-index: 2;
 }
 
-/* ✅ スロット（少し下） */
+/* ✅ スロット上に */
 .slot {
   position: absolute;
-  top: 48%;
+  top: 40%; /* ←ここ上げた */
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 8%;
 }
 
-/* ✅ リール（2px小さく） */
+/* リール */
 .reel {
   width: 88px;
   height: 88px;
   overflow: hidden;
-  background: transparent;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -62,7 +57,7 @@ body {
   align-items: center;
 }
 
-/* ✅ 画像サイズ（2px小さく） */
+/* 画像 */
 .reel-inner img {
   width: 58px;
   height: 58px;
@@ -74,20 +69,27 @@ body {
   animation: spin 0.08s linear infinite;
 }
 
-/* ✅ 画像サイズと完全一致 */
+/* ✅ はみ出し完全防止 */
 @keyframes spin {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-58px); }
+  0% { transform: translateY(-58px); }
+  100% { transform: translateY(-116px); }
 }
 
-/* ボタン */
+/* ボタン（下のまま） */
 .spin-btn {
   position: absolute;
-  top: 72%;
+  top: 75%;
   left: 50%;
   transform: translateX(-50%);
   width: 55%;
-  max-width: 320px;
+}
+
+/* 紙吹雪 */
+#confetti {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
 }
 </style>
 </head>
@@ -105,9 +107,13 @@ body {
   </div>
 
   <img src="button.png" class="spin-btn" onclick="spinSlot()">
+
+  <canvas id="confetti"></canvas>
 </div>
 
 <audio id="spinSE" src="spin_full.mp3"></audio>
+<audio id="normalSE" src="normal.mp3"></audio>
+<audio id="jackpotSE" src="jackpot.mp3"></audio>
 
 <script>
 const images = [
@@ -115,7 +121,10 @@ const images = [
   "face4.png","face5.png","face6.png"
 ];
 
+const jackpotIndex = 2;
+
 let spinning = false;
+let results = [];
 
 /* リール生成 */
 function createReel(){
@@ -127,7 +136,7 @@ function createReel(){
   return html;
 }
 
-/* 初期表示（中央固定） */
+/* 初期表示 */
 ["r1","r2","r3"].forEach(id=>{
   const reel = document.getElementById(id);
   const index = Math.floor(Math.random()*images.length);
@@ -141,12 +150,20 @@ function createReel(){
   `;
 });
 
+/* SE再生 */
+function playSE(id){
+  const audio = document.getElementById(id);
+  audio.currentTime = 0;
+  audio.play().catch(()=>{});
+}
+
 /* 回す */
 function spinSlot(){
   if(spinning) return;
   spinning = true;
+  results = [];
 
-  document.getElementById("spinSE").play();
+  playSE("spinSE");
 
   ["r1","r2","r3"].forEach(id=>{
     const reel = document.getElementById(id);
@@ -163,10 +180,12 @@ function spinSlot(){
   setTimeout(()=>stopReel("r3"), 4200);
 }
 
-/* 停止（ズレ防止） */
+/* 停止 */
 function stopReel(id){
   const reel = document.getElementById(id);
   const index = Math.floor(Math.random()*images.length);
+
+  results.push(index);
 
   reel.innerHTML = `
     <div class="reel-inner" style="transform: translateY(-58px)">
@@ -176,9 +195,65 @@ function stopReel(id){
     </div>
   `;
 
-  if(id === "r3"){
-    spinning = false;
+  if(results.length === 3){
+    setTimeout(()=>{
+      checkWin();
+      spinning = false;
+    },200);
   }
+}
+
+/* 判定 */
+function checkWin(){
+  if(results[0] === results[1] && results[1] === results[2]){
+
+    if(results[0] === jackpotIndex){
+      playSE("jackpotSE");
+      showConfetti(120); // 多め
+    } else {
+      playSE("normalSE");
+      showConfetti(60);
+    }
+  }
+}
+
+/* 紙吹雪 */
+function showConfetti(amount){
+  const canvas = document.getElementById("confetti");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = window.innerWidth;
+  canvas.height = 200;
+
+  let pieces = [];
+
+  for(let i=0;i<amount;i++){
+    pieces.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      size: Math.random()*6+4,
+      speed: Math.random()*3+2
+    });
+  }
+
+  let frame = 0;
+
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    pieces.forEach(p=>{
+      ctx.fillStyle = `hsl(${Math.random()*360},100%,50%)`;
+      ctx.fillRect(p.x,p.y,p.size,p.size);
+      p.y += p.speed;
+    });
+
+    frame++;
+    if(frame < 60){
+      requestAnimationFrame(draw);
+    }
+  }
+
+  draw();
 }
 </script>
 
