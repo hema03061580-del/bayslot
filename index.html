@@ -19,30 +19,33 @@ body {
 
 .bg { width: 100%; }
 
-/* ロゴ */
+/* 🔥 ロゴ（被らない位置） */
 .logo {
   position: absolute;
-  top: -6%;
+  top: 0%;
   left: 50%;
   transform: translateX(-50%);
   width: 95%;
 }
 
-/* 🎯 スロット位置（しっかり下げる） */
+/* 🔥 スロット位置（しっかり下げる） */
 .slot {
   position: absolute;
-  top: 60%;
+  top: 68%;
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
-  gap: 10px;
+  gap: 14px;
 }
 
-/* 🎯 リール（1マスだけ表示） */
+/* 🔥 リール（拡大＆1マス表示） */
 .reel {
-  width: 80px;
-  height: 56px; /* ←ここ超重要 */
+  width: 90px;
+  height: 56px;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* 中身 */
@@ -52,29 +55,31 @@ body {
   align-items: center;
 }
 
-/* 画像 */
+/* 🔥 画像（はみ出し防止） */
 .reel-inner img {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 54px;
+  object-fit: contain;
 }
 
-/* 🎯 回転（ズレない版） */
+/* 回転 */
 .spin {
   animation: spin 0.08s linear infinite;
 }
 
+/* 🔥 ズレない回転 */
 @keyframes spin {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-56px); }
+  100% { transform: translateY(-54px); }
 }
 
 /* ボタン */
 .spin-btn {
   position: absolute;
-  top: 82%;
+  top: 85%;
   left: 50%;
   transform: translateX(-50%);
-  width: 55%;
+  width: 60%;
 }
 
 /* 紙吹雪 */
@@ -105,7 +110,7 @@ body {
   <canvas id="confetti"></canvas>
 </div>
 
-<!-- 🎵 1本化音 -->
+<!-- 🎵 1本音 -->
 <audio id="spinFull" src="spin_full.mp3"></audio>
 
 <script>
@@ -145,7 +150,7 @@ function createReel(){
   return html;
 }
 
-/* 初期 */
+/* 初期表示 */
 ["r1","r2","r3"].forEach(id=>{
   const index = Math.floor(Math.random()*images.length);
 
@@ -166,7 +171,6 @@ function spinSlot(){
 
   playSpin();
 
-  /* 回転開始（音に合わせる） */
   setTimeout(()=>{
     ["r1","r2","r3"].forEach(id=>{
       document.getElementById(id).innerHTML = `
@@ -177,7 +181,6 @@ function spinSlot(){
     });
   },230);
 
-  /* 停止タイミング（あなたの音に合わせてる） */
   setTimeout(()=>stopReel("r1"), 2270);
   setTimeout(()=>stopReel("r2"), 3080);
   setTimeout(()=>stopReel("r3"), 4150);
@@ -214,7 +217,7 @@ function checkWin(){
   }
 }
 
-/* 🎉 紙吹雪（消える） */
+/* 紙吹雪 */
 function showConfetti(amount){
   const canvas = document.getElementById("confetti");
   const ctx = canvas.getContext("2d");
