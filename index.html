@@ -24,33 +24,36 @@ body {
   display: block;
 }
 
-/* ロゴ */
+/* ロゴ（上に固定） */
 .logo {
   position: absolute;
-  top: 8%;
+  top: 5%;
   left: 50%;
   transform: translateX(-50%);
-  width: 60%;
-  max-width: 400px;
+  width: 65%;
+  max-width: 450px;
+  z-index: 2;
 }
 
-/* スロット位置（少し右へ） */
+/* スロット位置 */
 .slot {
   position: absolute;
-  top: 32%;
-  left: 18%;
+  top: 35%;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  gap: 10%;
+  gap: 8%;
 }
 
-/* リール */
+/* リール（サイズ完全固定） */
 .reel {
-  width: 20vw;
-  height: 20vw;
-  max-width: 150px;
-  max-height: 150px;
+  width: 22vw;
+  height: 22vw;
+  max-width: 140px;
+  max-height: 140px;
   overflow: hidden;
   background: white;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -60,18 +63,19 @@ body {
 .reel-inner {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
-/* 画像（サイズ調整ここ重要） */
+/* 画像（ここ超重要：完全固定） */
 .reel-inner img {
-  width: 85%;
-  height: 85%;
+  width: 90%;
+  height: 90%;
   object-fit: contain;
 }
 
 /* 回転 */
 .spin {
-  animation: spin 0.2s linear infinite;
+  animation: spin 0.15s linear infinite;
 }
 
 @keyframes spin {
@@ -82,11 +86,11 @@ body {
 /* ボタン */
 .spin-btn {
   position: absolute;
-  top: 60%;
+  top: 65%;
   left: 50%;
   transform: translateX(-50%);
-  width: 50%;
-  max-width: 300px;
+  width: 55%;
+  max-width: 320px;
 }
 
 /* 紙吹雪 */
@@ -130,17 +134,7 @@ const jackpotIndex = 2;
 let spinning = false;
 let results = [];
 
-/* リール生成 */
-function createReel(){
-  let html = "";
-  for(let i=0;i<10;i++){
-    const rand = Math.floor(Math.random()*images.length);
-    html += `<img src="${images[rand]}">`;
-  }
-  return html;
-}
-
-/* 初期表示 */
+/* 初期表示（ズレ防止：必ず同じ構造） */
 ["r1","r2","r3"].forEach(id=>{
   const reel = document.getElementById(id);
   const index = Math.floor(Math.random()*images.length);
@@ -151,6 +145,16 @@ function createReel(){
     </div>
   `;
 });
+
+/* リール生成 */
+function createReel(){
+  let html = "";
+  for(let i=0;i<10;i++){
+    const rand = Math.floor(Math.random()*images.length);
+    html += `<img src="${images[rand]}">`;
+  }
+  return html;
+}
 
 /* 回す */
 function spinSlot(){
@@ -163,7 +167,12 @@ function spinSlot(){
   ["r1","r2","r3"].forEach(id=>{
     const reel = document.getElementById(id);
 
-    reel.innerHTML = `<div class="reel-inner">${createReel()}</div>`;
+    reel.innerHTML = `
+      <div class="reel-inner">
+        ${createReel()}
+      </div>
+    `;
+
     reel.querySelector(".reel-inner").classList.add("spin");
   });
 
@@ -197,6 +206,7 @@ function stopReel(id){
 
   results.push(index);
 
+  /* ←ここ統一（ズレ防止の最重要ポイント） */
   reel.innerHTML = `
     <div class="reel-inner">
       <img src="${images[index]}">
