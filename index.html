@@ -37,7 +37,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 1.5px;
+  gap: 2px;
 }
 
 /* リール */
@@ -72,7 +72,7 @@ body {
   100% { transform: translateY(-60px); }
 }
 
-/* 🔥 ボタン */
+/* ボタン */
 .spin-btn {
   position: absolute;
   top: 85%;
@@ -82,16 +82,9 @@ body {
   transition: transform 0.1s, filter 0.1s, opacity 0.2s;
 }
 
-/* 押した時（沈む） */
-.spin-btn:active {
-  transform: translateX(-50%) scale(0.92);
-  filter: brightness(0.85);
-}
-
-/* 🔥 ロック（見た目だけ） */
+/* ロック */
 .spin-btn.lock {
   opacity: 0.5;
-  /* pointer-events 削除済み */
 }
 
 /* 紙吹雪 */
@@ -116,14 +109,10 @@ body {
     <div class="reel"><div id="r3"></div></div>
   </div>
 
-  <!-- ボタン -->
   <img src="button.png" id="spinBtn" class="spin-btn" onclick="spinSlot()">
 
   <canvas id="confetti"></canvas>
 </div>
-
-<!-- 🎵 一体型SE -->
-<audio id="spinFull" src="spin_full.mp3"></audio>
 
 <script>
 const images = [
@@ -138,29 +127,28 @@ let results = [];
 
 const btn = document.getElementById("spinBtn");
 
-/* 音解放（スマホ用） */
+/* 🔥 音解放（スマホ） */
 function unlockAudio(){
-  document.querySelectorAll("audio").forEach(a=>{
-    a.play().catch(()=>{});
-    a.pause();
-    a.currentTime = 0;
-  });
+  new Audio("spin_full.mp3").play().catch(()=>{});
 }
 document.body.addEventListener("touchstart", unlockAudio, { once: true });
 
-/* 音再生 */
-function spinSlot(){
-  if(spinning) return;
+/* 🔥 音（毎回生成） */
+function playSpin(){
+  const audio = new Audio("spin_full.mp3");
+  audio.play().catch(()=>{});
+}
 
-  spinning = true;
-  results = [];
+/* 🔥 ボタン沈む（JS制御） */
+function pressButton(){
+  btn.style.transform = "translateX(-50%) scale(0.9)";
+  btn.style.filter = "brightness(0.8)";
 
-  btn.classList.add("lock");
-
-  // 🔥 ちょっと遅らせる
   setTimeout(()=>{
-    playSpin();
-  }, 50);
+    btn.style.transform = "translateX(-50%) scale(1)";
+    btn.style.filter = "brightness(1)";
+  },120);
+}
 
 /* 初期表示 */
 ["r1","r2","r3"].forEach(id=>{
@@ -188,13 +176,14 @@ function createReel(){
 function spinSlot(){
   if(spinning) return;
 
+  pressButton(); // 🔥 毎回沈む
+
   spinning = true;
   results = [];
 
-  // 見た目ロック
   btn.classList.add("lock");
 
-  playSpin();
+  setTimeout(()=>{ playSpin(); },80);
 
   setTimeout(()=>{
     ["r1","r2","r3"].forEach(id=>{
@@ -224,7 +213,6 @@ function stopReel(id){
     </div>
   `;
 
-  // 最後で解除
   if(results.length === 3){
     setTimeout(()=>{
       checkWin();
