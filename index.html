@@ -82,7 +82,6 @@ body {
   transition: transform 0.1s, filter 0.1s, opacity 0.2s;
 }
 
-/* ロック状態 */
 .spin-btn.lock {
   opacity: 0.5;
 }
@@ -127,7 +126,7 @@ let results = [];
 
 const btn = document.getElementById("spinBtn");
 
-/* 🔥 音解放（無音で） */
+/* 音解放（無音） */
 function unlockAudio(){
   const audio = new Audio("spin_full.mp3");
   audio.volume = 0;
@@ -135,17 +134,22 @@ function unlockAudio(){
 }
 document.body.addEventListener("touchstart", unlockAudio, { once: true });
 
-/* 🔥 音再生（毎回新規） */
+/* 回転音 */
 function playSpin(){
   const audio = new Audio("spin_full.mp3");
   audio.play().catch(()=>{});
 }
 
-/* 🔥 ボタン沈む（JS制御） */
+/* 当たり音 */
+function playSE(src){
+  const audio = new Audio(src);
+  audio.play().catch(()=>{});
+}
+
+/* ボタン沈む */
 function pressButton(){
   btn.style.transform = "translateX(-50%) scale(0.9)";
   btn.style.filter = "brightness(0.8)";
-
   setTimeout(()=>{
     btn.style.transform = "translateX(-50%) scale(1)";
     btn.style.filter = "brightness(1)";
@@ -155,7 +159,6 @@ function pressButton(){
 /* 初期表示 */
 ["r1","r2","r3"].forEach(id=>{
   const index = Math.floor(Math.random()*images.length);
-
   document.getElementById(id).innerHTML = `
     <div class="reel-inner">
       <img src="${images[index]}">
@@ -179,14 +182,11 @@ function spinSlot(){
   if(spinning) return;
 
   pressButton();
-
   spinning = true;
   results = [];
-
   btn.classList.add("lock");
 
-  // 🔥 音は少し遅らせる（二重防止＆沈み優先）
-  setTimeout(()=>{ playSpin(); },80);
+  setTimeout(()=>playSpin(),80);
 
   setTimeout(()=>{
     ["r1","r2","r3"].forEach(id=>{
@@ -225,10 +225,25 @@ function stopReel(id){
   }
 }
 
-/* 判定 */
+/* 判定＋当たり音 */
 function checkWin(){
   if(results[0] === results[1] && results[1] === results[2]){
-    showConfetti(results[0] === jackpotIndex ? 180 : 80);
+
+    if(results[0] === jackpotIndex){
+      showConfetti(180);
+
+      setTimeout(()=>{
+        playSE("bgm2.mp3");
+      },5200);
+
+    } else {
+      showConfetti(80);
+
+      setTimeout(()=>{
+        playSE("bgm1.mp3");
+      },5200);
+    }
+
   }
 }
 
