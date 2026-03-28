@@ -42,7 +42,7 @@ body {
 
 /* 🎯 リール */
 .reel {
-  height: 100px;
+  height: 90px;   /* ←基準 */
   overflow: hidden;
 }
 
@@ -54,14 +54,15 @@ body {
 }
 
 .reel-inner img {
-  width: 80%;
-  height: auto;
+  height: 90px;   /* ←ここ絶対同じにする */
+  width: auto;
+  display: block;
 }
   
 /* 🎯 回転 */
 @keyframes spin {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-110px); } /* ←高さと同じにする */
+  100% { transform: translateY(-90px); } /* ←これも一致 */
 }
 
 /* 🎯 ボタン */
