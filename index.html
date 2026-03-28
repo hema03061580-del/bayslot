@@ -205,26 +205,7 @@ function spinSlot(){
 }
 
 /* 停止 */
-function stopReel(id){
-  const index = Math.floor(Math.random()*images.length);
-  results.push(index);
-
-  document.getElementById(id).innerHTML = `
-    <div class="reel-inner">
-      <img src="${images[index]}">
-      <img src="${images[index]}">
-      <img src="${images[index]}">
-    </div>
-  `;
-
-  if(results.length === 3){
-    setTimeout(()=>{
-      checkWin();
-      spinning = false;
-      btn.classList.remove("lock");
-    },200);
-  }
-}
+const index = jackpotIndex;
 
 /* 🎯 判定＋当たり音（修正済み） */
 function checkWin(){
