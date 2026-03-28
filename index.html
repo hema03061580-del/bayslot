@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -26,7 +24,7 @@ body {
   display: block;
 }
 
-/* スロット位置（スマホ対応） */
+/* スロット位置 */
 .slot {
   position: absolute;
   top: 32%;
@@ -35,14 +33,15 @@ body {
   gap: 10%;
 }
 
-/* リール */
+/* 🎯 リール（高さ固定） */
 .reel {
   width: 20vw;
-  height: 20vw;
-  max-width: 150px;
-  max-height: 150px;
+  max-width: 120px;
+  height: 80px;          /* ←ここ基準 */
   overflow: hidden;
   background: white;
+  display: flex;
+  justify-content: center;
 }
 
 /* 中身 */
@@ -52,21 +51,23 @@ body {
   align-items: center;
 }
 
-/* 画像 */
+/* 🎯 画像（高さ完全一致） */
 .reel-inner img {
-  width: 100%;
-  height: 150px;   /* ←固定にする */
+  height: 80px;          /* ←reelと同じ */
+  width: auto;
+  display: block;
   object-fit: contain;
 }
 
 /* 回転 */
 .spin {
-  animation: spin 0.08s linear infinite;
+  animation: spin 0.1s linear infinite;
 }
 
+/* 🎯 アニメーション（高さと一致） */
 @keyframes spin {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-100%); }
+  100% { transform: translateY(-80px); }
 }
 
 /* ボタン */
@@ -100,7 +101,6 @@ body {
     <div class="reel"><div id="r3"></div></div>
   </div>
 
-  <!-- ボタン -->
   <img src="button.png" class="spin-btn" onclick="spinSlot()">
 
   <canvas id="confetti"></canvas>
@@ -120,7 +120,7 @@ const jackpotIndex = 2;
 let spinning = false;
 let results = [];
 
-/* リール生成 */
+/* 🎯 リール生成（高さ固定） */
 function createReel(){
   let html = "";
   for(let i=0;i<10;i++){
@@ -151,9 +151,9 @@ function spinSlot(){
     reel.querySelector(".reel-inner").classList.add("spin");
   });
 
-  setTimeout(()=>stopReel("r1"), 3000);
-  setTimeout(()=>stopReel("r2"), 3500);
-  setTimeout(()=>stopReel("r3"), 4200);
+  setTimeout(()=>stopReel("r1"), 2000);
+  setTimeout(()=>stopReel("r2"), 2500);
+  setTimeout(()=>stopReel("r3"), 3000);
 }
 
 /* 停止 */
@@ -181,6 +181,7 @@ function stopReel(id){
 
   results.push(index);
 
+  /* 🎯 完全にズレない構造 */
   reel.innerHTML = `
     <div class="reel-inner">
       <img src="${images[index]}">
