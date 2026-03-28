@@ -149,10 +149,18 @@ function unlockAudio(){
 document.body.addEventListener("touchstart", unlockAudio, { once: true });
 
 /* 音再生 */
-function playSpin(){
-  const audio = new Audio("spin_full.mp3");
-  audio.play().catch(()=>{});
-}
+function spinSlot(){
+  if(spinning) return;
+
+  spinning = true;
+  results = [];
+
+  btn.classList.add("lock");
+
+  // 🔥 ちょっと遅らせる
+  setTimeout(()=>{
+    playSpin();
+  }, 50);
 
 /* 初期表示 */
 ["r1","r2","r3"].forEach(id=>{
