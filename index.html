@@ -17,9 +17,7 @@ body {
   margin: 0 auto;
 }
 
-.bg {
-  width: 100%;
-}
+.bg { width: 100%; }
 
 /* ロゴ */
 .logo {
@@ -126,30 +124,42 @@ let results = [];
 
 const btn = document.getElementById("spinBtn");
 
-/* 🔥 音解放（無音） */
+/* 🎵 事前ロード（超重要） */
+const spinFull = new Audio("spin_full.mp3");
+const bgm1 = new Audio("bgm1.mp3");
+const bgm2 = new Audio("bgm2.mp3");
+
+/* 🔓 スマホ音解放 */
 function unlockAudio(){
-  const audio = new Audio("spin_full.mp3");
-  audio.volume = 0;
-  audio.play().then(()=>audio.pause()).catch(()=>{});
+  [spinFull, bgm1, bgm2].forEach(a=>{
+    a.volume = 0;
+    a.play().then(()=>a.pause()).catch(()=>{});
+    a.currentTime = 0;
+  });
 }
 document.body.addEventListener("touchstart", unlockAudio, { once: true });
 
-/* 🔥 回転音 */
+/* 🎵 再生 */
 function playSpin(){
-  const audio = new Audio("spin_full.mp3");
-  audio.play().catch(()=>{});
+  spinFull.currentTime = 0;
+  spinFull.play().catch(()=>{});
 }
 
-/* 🔥 当たり音 */
-function playSE(src){
-  const audio = new Audio(src);
-  audio.play().catch(()=>{});
+function playBGM(type){
+  if(type === "normal"){
+    bgm1.currentTime = 0;
+    bgm1.play().catch(()=>{});
+  } else if(type === "jackpot"){
+    bgm2.currentTime = 0;
+    bgm2.play().catch(()=>{});
+  }
 }
 
-/* 🔥 ボタン沈む */
+/* 🔘 ボタン沈む */
 function pressButton(){
   btn.style.transform = "translateX(-50%) scale(0.9)";
   btn.style.filter = "brightness(0.8)";
+
   setTimeout(()=>{
     btn.style.transform = "translateX(-50%) scale(1)";
     btn.style.filter = "brightness(1)";
@@ -159,6 +169,7 @@ function pressButton(){
 /* 初期表示 */
 ["r1","r2","r3"].forEach(id=>{
   const index = Math.floor(Math.random()*images.length);
+
   document.getElementById(id).innerHTML = `
     <div class="reel-inner">
       <img src="${images[index]}">
@@ -181,13 +192,13 @@ function createReel(){
 function spinSlot(){
   if(spinning) return;
 
-  pressButton();
-
   spinning = true;
   results = [];
+
+  pressButton();
   btn.classList.add("lock");
 
-  setTimeout(()=>playSpin(),80);
+  setTimeout(()=>{ playSpin(); },80);
 
   setTimeout(()=>{
     ["r1","r2","r3"].forEach(id=>{
@@ -226,27 +237,24 @@ function stopReel(id){
   }
 }
 
-/* 🎯 判定＋当たり音（修正済み） */
+/* 判定 */
 function checkWin(){
   if(results[0] === results[1] && results[1] === results[2]){
 
     if(results[0] === jackpotIndex){
       showConfetti(180);
 
-      // 🌈 大当たり音
       setTimeout(()=>{
-        playSE("bgm2.mp3");
-      },500);
+        playBGM("jackpot");
+      },300);
 
     } else {
       showConfetti(80);
 
-      // 🎉 通常当たり音
       setTimeout(()=>{
-        playSE("bgm1.mp3");
-      },500);
+        playBGM("normal");
+      },300);
     }
-
   }
 }
 
