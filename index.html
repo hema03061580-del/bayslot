@@ -54,8 +54,8 @@ body {
 .reel-inner {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center; /* ←これが超重要 */
+  align-items: flex-start; /* ←これに変更 */
+  justify-content: center;
   height: 100%;
 }
 
@@ -153,8 +153,13 @@ function createReel(){
 
 /* 初期表示 */
 ["r1","r2","r3"].forEach(id=>{
-  document.getElementById(id).innerHTML =
-    `<div class="reel-inner">${createReel()}</div>`;
+  const index = Math.floor(Math.random()*images.length);
+
+  document.getElementById(id).innerHTML = `
+    <div class="reel-inner">
+      <img src="${images[index]}">
+    </div>
+  `;
 });
 
 /* 🎰 回転 */
