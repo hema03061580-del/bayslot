@@ -23,14 +23,14 @@ body {
   width: 100%;
 }
 
-/* ロゴ（さらに上＆少し大きく） */
+/* ✅ ロゴ（さらに上） */
 .logo {
   position: absolute;
-  top: -2%;
+  top: -6%;
   left: 50%;
   transform: translateX(-50%);
-  width: 70%;
-  max-width: 480px;
+  width: 65%;
+  max-width: 420px;
   z-index: 2;
 }
 
@@ -44,10 +44,10 @@ body {
   gap: 8%;
 }
 
-/* リール */
+/* ✅ リール（少し小さく） */
 .reel {
-  width: 140px;
-  height: 120px;
+  width: 120px;
+  height: 100px;
   overflow: hidden;
   background: white;
 
@@ -63,10 +63,10 @@ body {
   align-items: center;
 }
 
-/* 画像（完全固定） */
+/* ✅ 画像（小さく統一） */
 .reel-inner img {
-  width: 120px;
-  height: 120px;
+  width: 100px;
+  height: 100px;
   object-fit: contain;
 }
 
@@ -77,7 +77,7 @@ body {
 
 @keyframes spin {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-120px); }
+  100% { transform: translateY(-100px); }
 }
 
 /* ボタン */
@@ -116,8 +116,9 @@ const images = [
 ];
 
 let spinning = false;
+let results = [];
 
-/* 初期表示（中央固定） */
+/* 初期表示 */
 ["r1","r2","r3"].forEach(id=>{
   const reel = document.getElementById(id);
   const index = Math.floor(Math.random()*images.length);
@@ -135,6 +136,7 @@ let spinning = false;
 function spinSlot(){
   if(spinning) return;
   spinning = true;
+  results = [];
 
   document.getElementById("spinSE").play();
 
@@ -150,10 +152,13 @@ function spinSlot(){
     reel.querySelector(".reel-inner").classList.add("spin");
   });
 
-  setTimeout(()=>stopAll(), 3000);
+  /* ✅ 順番停止復活 */
+  setTimeout(()=>stopReel("r1"), 3000);
+  setTimeout(()=>stopReel("r2"), 3500);
+  setTimeout(()=>stopReel("r3"), 4200);
 }
 
-/* リール生成（高さ統一） */
+/* リール生成 */
 function createReel(){
   let html = "";
   for(let i=0;i<10;i++){
@@ -163,23 +168,27 @@ function createReel(){
   return html;
 }
 
-/* 停止（完全中央固定） */
-function stopAll(){
-  ["r1","r2","r3"].forEach(id=>{
-    const reel = document.getElementById(id);
+/* 停止 */
+function stopReel(id){
+  const reel = document.getElementById(id);
+  const inner = reel.querySelector(".reel-inner");
 
-    const index = Math.floor(Math.random()*images.length);
+  inner.classList.remove("spin");
 
-    reel.innerHTML = `
-      <div class="reel-inner">
-        <img src="${images[index]}">
-        <img src="${images[index]}">
-        <img src="${images[index]}">
-      </div>
-    `;
-  });
+  const index = Math.floor(Math.random()*images.length);
+  results.push(index);
 
-  spinning = false;
+  reel.innerHTML = `
+    <div class="reel-inner">
+      <img src="${images[index]}">
+      <img src="${images[index]}">
+      <img src="${images[index]}">
+    </div>
+  `;
+
+  if(results.length === 3){
+    spinning = false;
+  }
 }
 </script>
 
