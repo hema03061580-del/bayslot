@@ -205,7 +205,19 @@ function spinSlot(){
 }
 
 /* 停止 */
-const index = jackpotIndex;
+function stopReel(id){
+  const index = jackpotIndex; // ←ここを変更
+
+  results.push(index);
+
+  document.getElementById(id).innerHTML = `
+    <div class="reel-inner">
+      <img src="${images[index]}">
+      <img src="${images[index]}">
+      <img src="${images[index]}">
+    </div>
+  `;
+}
 
 /* 🎯 判定＋当たり音（修正済み） */
 function checkWin(){
