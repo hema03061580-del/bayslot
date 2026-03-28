@@ -24,7 +24,7 @@ body {
 /* ロゴ */
 .logo {
   position: absolute;
-  top: 20%;
+  top: 30%;
   left: 50%;
   transform: translateX(-50%);
   width: 95%;
@@ -33,11 +33,11 @@ body {
 /* スロット */
 .slot {
   position: absolute;
-  top: 57%;
+  top: 65%;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 3px;
+  gap: 12px;
 }
 
 /* リール */
@@ -82,16 +82,16 @@ body {
   transition: transform 0.1s, filter 0.1s, opacity 0.2s;
 }
 
-/* 押した時 */
+/* 押した時（沈む） */
 .spin-btn:active {
   transform: translateX(-50%) scale(0.92);
   filter: brightness(0.85);
 }
 
-/* 🔥 ロック状態（連打防止） */
+/* 🔥 ロック（見た目だけ） */
 .spin-btn.lock {
   opacity: 0.5;
-  pointer-events: none;
+  /* pointer-events 削除済み */
 }
 
 /* 紙吹雪 */
@@ -122,7 +122,7 @@ body {
   <canvas id="confetti"></canvas>
 </div>
 
-<!-- 🎵 まとめ音 -->
+<!-- 🎵 一体型SE -->
 <audio id="spinFull" src="spin_full.mp3"></audio>
 
 <script>
@@ -138,7 +138,7 @@ let results = [];
 
 const btn = document.getElementById("spinBtn");
 
-/* 音解放（スマホ必須） */
+/* 音解放（スマホ用） */
 function unlockAudio(){
   document.querySelectorAll("audio").forEach(a=>{
     a.play().catch(()=>{});
@@ -184,7 +184,7 @@ function spinSlot(){
   spinning = true;
   results = [];
 
-  // 🔥 ボタンロック
+  // 見た目ロック
   btn.classList.add("lock");
 
   playSpin();
@@ -217,16 +217,12 @@ function stopReel(id){
     </div>
   `;
 
-  // 🔥 最後のリールで完全終了
+  // 最後で解除
   if(results.length === 3){
     setTimeout(()=>{
       checkWin();
-
       spinning = false;
-
-      // 🔥 ボタン解除
       btn.classList.remove("lock");
-
     },200);
   }
 }
