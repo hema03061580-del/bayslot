@@ -19,7 +19,7 @@ body {
 
 .bg { width: 100%; }
 
-/* 🔥 ロゴ（被らない位置） */
+/* ロゴ */
 .logo {
   position: absolute;
   top: 0%;
@@ -28,20 +28,20 @@ body {
   width: 95%;
 }
 
-/* 🔥 スロット位置（しっかり下げる） */
+/* 🔥 枠にピッタリ合わせる */
 .slot {
   position: absolute;
-  top: 68%;
+  top: 63%; /* ←ここ超重要（枠に合わせた） */
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
-  gap: 14px;
+  gap: 12px;
 }
 
-/* 🔥 リール（拡大＆1マス表示） */
+/* 🔥 リール（拡大） */
 .reel {
-  width: 90px;
-  height: 56px;
+  width: 95px;
+  height: 62px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -55,10 +55,10 @@ body {
   align-items: center;
 }
 
-/* 🔥 画像（はみ出し防止） */
+/* 🔥 画像拡大 */
 .reel-inner img {
-  width: 60px;
-  height: 54px;
+  width: 68px;
+  height: 60px;
   object-fit: contain;
 }
 
@@ -67,10 +67,10 @@ body {
   animation: spin 0.08s linear infinite;
 }
 
-/* 🔥 ズレない回転 */
+/* 🔥 ピッタリ1コマ分 */
 @keyframes spin {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-54px); }
+  100% { transform: translateY(-60px); }
 }
 
 /* ボタン */
@@ -88,7 +88,6 @@ body {
   top: 0;
   left: 0;
   pointer-events: none;
-  z-index: 10;
 }
 </style>
 </head>
@@ -110,7 +109,6 @@ body {
   <canvas id="confetti"></canvas>
 </div>
 
-<!-- 🎵 1本音 -->
 <audio id="spinFull" src="spin_full.mp3"></audio>
 
 <script>
@@ -124,7 +122,7 @@ const jackpotIndex = 2;
 let spinning = false;
 let results = [];
 
-/* 🔓 音解放 */
+/* 音解放 */
 function unlockAudio(){
   document.querySelectorAll("audio").forEach(a=>{
     a.play().catch(()=>{});
@@ -134,12 +132,24 @@ function unlockAudio(){
 }
 document.body.addEventListener("touchstart", unlockAudio, { once: true });
 
-/* 🎵 再生 */
 function playSpin(){
   const audio = document.getElementById("spinFull");
   audio.currentTime = 0;
   audio.play().catch(()=>{});
 }
+
+/* 初期表示 */
+["r1","r2","r3"].forEach(id=>{
+  const index = Math.floor(Math.random()*images.length);
+
+  document.getElementById(id).innerHTML = `
+    <div class="reel-inner">
+      <img src="${images[index]}">
+      <img src="${images[index]}">
+      <img src="${images[index]}">
+    </div>
+  `;
+});
 
 /* リール生成 */
 function createReel(){
@@ -149,19 +159,6 @@ function createReel(){
   }
   return html;
 }
-
-/* 初期表示 */
-["r1","r2","r3"].forEach(id=>{
-  const index = Math.floor(Math.random()*images.length);
-
-  document.getElementById(id).innerHTML = `
-    <div class="reel-inner" style="transform: translateY(0)">
-      <img src="${images[index]}">
-      <img src="${images[index]}">
-      <img src="${images[index]}">
-    </div>
-  `;
-});
 
 /* 回す */
 function spinSlot(){
@@ -181,9 +178,9 @@ function spinSlot(){
     });
   },230);
 
-  setTimeout(()=>stopReel("r1"), 2270);
-  setTimeout(()=>stopReel("r2"), 3080);
-  setTimeout(()=>stopReel("r3"), 4150);
+  setTimeout(()=>stopReel("r1"), 3000);
+  setTimeout(()=>stopReel("r2"), 3500);
+  setTimeout(()=>stopReel("r3"), 4200);
 
   setTimeout(()=>{
     checkWin();
@@ -197,7 +194,7 @@ function stopReel(id){
   results.push(index);
 
   document.getElementById(id).innerHTML = `
-    <div class="reel-inner" style="transform: translateY(0)">
+    <div class="reel-inner">
       <img src="${images[index]}">
       <img src="${images[index]}">
       <img src="${images[index]}">
@@ -208,12 +205,7 @@ function stopReel(id){
 /* 判定 */
 function checkWin(){
   if(results[0] === results[1] && results[1] === results[2]){
-
-    if(results[0] === jackpotIndex){
-      showConfetti(180);
-    } else {
-      showConfetti(80);
-    }
+    showConfetti(results[0] === jackpotIndex ? 180 : 80);
   }
 }
 
