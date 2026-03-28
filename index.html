@@ -20,7 +20,6 @@ body {
 .bg {
   position: relative;
   width: 100%;
-  top: 0%;
 }
 
 /* ロゴ */
@@ -35,7 +34,7 @@ body {
 /* スロット */
 .slot {
   position: absolute;
-  top: 65%; /* ←ここだけ修正（見える位置） */
+  top: 65%;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -74,7 +73,7 @@ body {
   100% { transform: translateY(-60px); }
 }
 
-/* 🔥 ボタン */
+/* 🔥 ボタン（沈むだけ） */
 .spin-btn {
   position: absolute;
   top: 85%;
@@ -111,15 +110,14 @@ body {
     <div class="reel"><div id="r3"></div></div>
   </div>
 
-  <!-- 🔥 ボタン -->
-  <img src="button.png" class="spin-btn" onclick="clickSpin()">
+  <!-- ボタン -->
+  <img src="button.png" class="spin-btn" onclick="spinSlot()">
 
   <canvas id="confetti"></canvas>
 </div>
 
-<!-- 音 -->
+<!-- 🎵 bet→回転→停止込み音 -->
 <audio id="spinFull" src="spin_full.mp3"></audio>
-<audio id="clickSE" src="click.mp3"></audio>
 
 <script>
 const images = [
@@ -142,29 +140,11 @@ function unlockAudio(){
 }
 document.body.addEventListener("touchstart", unlockAudio, { once: true });
 
-/* 🔥 クリック音 */
-function playClick(){
-  const audio = document.getElementById("clickSE");
-  audio.currentTime = 0;
-  audio.play().catch(()=>{});
-}
-
-/* 回転音 */
+/* 🎵 再生 */
 function playSpin(){
   const audio = document.getElementById("spinFull");
   audio.currentTime = 0;
   audio.play().catch(()=>{});
-}
-
-/* 🔥 ボタン押し */
-function clickSpin(){
-  if(spinning) return;
-
-  playClick();
-
-  setTimeout(()=>{
-    spinSlot();
-  },100);
 }
 
 /* 初期表示 */
@@ -191,6 +171,7 @@ function createReel(){
 
 /* 回す */
 function spinSlot(){
+  if(spinning) return;
   spinning = true;
   results = [];
 
