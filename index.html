@@ -17,12 +17,16 @@ body {
   margin: 0 auto;
 }
 
-.bg { width: 100%; }
+.bg {
+  position: relative;  /* ←これ追加 */
+  width: 100%;
+  top: 0%;
+}
 
 /* ロゴ */
 .logo {
   position: absolute;
-  top: 0%;
+  top: 10%;
   left: 50%;
   transform: translateX(-50%);
   width: 95%;
@@ -31,7 +35,7 @@ body {
 /* 🔥 枠にピッタリ合わせる */
 .slot {
   position: absolute;
-  top: 63%; /* ←ここ超重要（枠に合わせた） */
+  top: 65%; /* ←ここ超重要（枠に合わせた） */
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
