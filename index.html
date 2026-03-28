@@ -82,7 +82,7 @@ body {
   transition: transform 0.1s, filter 0.1s, opacity 0.2s;
 }
 
-/* ロック */
+/* ロック状態 */
 .spin-btn.lock {
   opacity: 0.5;
 }
@@ -127,13 +127,15 @@ let results = [];
 
 const btn = document.getElementById("spinBtn");
 
-/* 🔥 音解放（スマホ） */
+/* 🔥 音解放（無音で） */
 function unlockAudio(){
-  new Audio("spin_full.mp3").play().catch(()=>{});
+  const audio = new Audio("spin_full.mp3");
+  audio.volume = 0;
+  audio.play().then(()=>audio.pause()).catch(()=>{});
 }
 document.body.addEventListener("touchstart", unlockAudio, { once: true });
 
-/* 🔥 音（毎回生成） */
+/* 🔥 音再生（毎回新規） */
 function playSpin(){
   const audio = new Audio("spin_full.mp3");
   audio.play().catch(()=>{});
@@ -176,13 +178,14 @@ function createReel(){
 function spinSlot(){
   if(spinning) return;
 
-  pressButton(); // 🔥 毎回沈む
+  pressButton();
 
   spinning = true;
   results = [];
 
   btn.classList.add("lock");
 
+  // 🔥 音は少し遅らせる（二重防止＆沈み優先）
   setTimeout(()=>{ playSpin(); },80);
 
   setTimeout(()=>{
