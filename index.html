@@ -206,8 +206,7 @@ function spinSlot(){
 
 /* 停止 */
 function stopReel(id){
-  const index = jackpotIndex; // ←ここを変更
-
+  const index = Math.floor(Math.random()*images.length);
   results.push(index);
 
   document.getElementById(id).innerHTML = `
@@ -217,6 +216,14 @@ function stopReel(id){
       <img src="${images[index]}">
     </div>
   `;
+
+  if(results.length === 3){
+    setTimeout(()=>{
+      checkWin();
+      spinning = false;
+      btn.classList.remove("lock");
+    },200);
+  }
 }
 
 /* 🎯 判定＋当たり音（修正済み） */
