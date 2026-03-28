@@ -17,51 +17,46 @@ body {
   margin: 0 auto;
 }
 
-.bg {
-  width: 100%;
-}
+.bg { width: 100%; }
 
 /* ロゴ */
 .logo {
   position: absolute;
-  top: -10%;
+  top: -8%;
   left: 50%;
   transform: translateX(-50%);
   width: 95%;
 }
 
-/* ✅ スロット上に */
+/* スロット */
 .slot {
   position: absolute;
-  top: 40%; /* ←ここ上げた */
+  top: 52%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   display: flex;
-  gap: 8%;
+  gap: 12px;
 }
 
 /* リール */
 .reel {
-  width: 88px;
-  height: 88px;
+  width: 80px;
+  height: 80px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* 中身 */
 .reel-inner {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* 画像 */
 .reel-inner img {
-  width: 58px;
-  height: 58px;
-  object-fit: contain;
+  width: 56px;
+  height: 56px;
 }
 
 /* 回転 */
@@ -69,16 +64,15 @@ body {
   animation: spin 0.08s linear infinite;
 }
 
-/* ✅ はみ出し完全防止 */
 @keyframes spin {
-  0% { transform: translateY(-58px); }
-  100% { transform: translateY(-116px); }
+  0% { transform: translateY(-56px); }
+  100% { transform: translateY(-112px); }
 }
 
-/* ボタン（下のまま） */
+/* ボタン */
 .spin-btn {
   position: absolute;
-  top: 75%;
+  top: 78%;
   left: 50%;
   transform: translateX(-50%);
   width: 55%;
@@ -90,6 +84,7 @@ body {
   top: 0;
   left: 0;
   pointer-events: none;
+  z-index: 10; /* 🔥 重要 */
 }
 </style>
 </head>
@@ -126,36 +121,48 @@ const jackpotIndex = 2;
 let spinning = false;
 let results = [];
 
+/* 🔥 音ロック解除 */
+function unlockAudio(){
+  document.querySelectorAll("audio").forEach(a=>{
+    a.play().catch(()=>{});
+    a.pause();
+    a.currentTime = 0;
+  });
+}
+document.body.addEventListener("touchstart", unlockAudio, { once: true });
+
+/* 🔥 SE（前の音止める） */
+function playSE(id){
+  document.querySelectorAll("audio").forEach(a=>{
+    a.pause();
+    a.currentTime = 0;
+  });
+
+  const audio = document.getElementById(id);
+  audio.play().catch(()=>{});
+}
+
 /* リール生成 */
 function createReel(){
   let html = "";
   for(let i=0;i<12;i++){
-    const rand = Math.floor(Math.random()*images.length);
-    html += `<img src="${images[rand]}">`;
+    html += `<img src="${images[Math.floor(Math.random()*images.length)]}">`;
   }
   return html;
 }
 
-/* 初期表示 */
+/* 初期 */
 ["r1","r2","r3"].forEach(id=>{
-  const reel = document.getElementById(id);
   const index = Math.floor(Math.random()*images.length);
 
-  reel.innerHTML = `
-    <div class="reel-inner" style="transform: translateY(-58px)">
+  document.getElementById(id).innerHTML = `
+    <div class="reel-inner" style="transform: translateY(-56px)">
       <img src="${images[index]}">
       <img src="${images[index]}">
       <img src="${images[index]}">
     </div>
   `;
 });
-
-/* SE再生 */
-function playSE(id){
-  const audio = document.getElementById(id);
-  audio.currentTime = 0;
-  audio.play().catch(()=>{});
-}
 
 /* 回す */
 function spinSlot(){
@@ -166,9 +173,7 @@ function spinSlot(){
   playSE("spinSE");
 
   ["r1","r2","r3"].forEach(id=>{
-    const reel = document.getElementById(id);
-
-    reel.innerHTML = `
+    document.getElementById(id).innerHTML = `
       <div class="reel-inner spin">
         ${createReel()}
       </div>
@@ -182,13 +187,11 @@ function spinSlot(){
 
 /* 停止 */
 function stopReel(id){
-  const reel = document.getElementById(id);
   const index = Math.floor(Math.random()*images.length);
-
   results.push(index);
 
-  reel.innerHTML = `
-    <div class="reel-inner" style="transform: translateY(-58px)">
+  document.getElementById(id).innerHTML = `
+    <div class="reel-inner" style="transform: translateY(-56px)">
       <img src="${images[index]}">
       <img src="${images[index]}">
       <img src="${images[index]}">
@@ -199,7 +202,7 @@ function stopReel(id){
     setTimeout(()=>{
       checkWin();
       spinning = false;
-    },200);
+    },400);
   }
 }
 
@@ -209,15 +212,15 @@ function checkWin(){
 
     if(results[0] === jackpotIndex){
       playSE("jackpotSE");
-      showConfetti(120); // 多め
+      showConfetti(180);
     } else {
       playSE("normalSE");
-      showConfetti(60);
+      showConfetti(80);
     }
   }
 }
 
-/* 紙吹雪 */
+/* 🎉 紙吹雪（消える版） */
 function showConfetti(amount){
   const canvas = document.getElementById("confetti");
   const ctx = canvas.getContext("2d");
@@ -248,8 +251,11 @@ function showConfetti(amount){
     });
 
     frame++;
+
     if(frame < 60){
       requestAnimationFrame(draw);
+    } else {
+      ctx.clearRect(0,0,canvas.width,canvas.height); // 🔥 完全消去
     }
   }
 
