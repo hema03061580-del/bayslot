@@ -26,7 +26,7 @@ body {
 /* ✅ ロゴ（さらに上） */
 .logo {
   position: absolute;
-  top: -6%;
+  top: -10%;
   left: 50%;
   transform: translateX(-50%);
   width: 65%;
@@ -37,17 +37,17 @@ body {
 /* スロット */
 .slot {
   position: absolute;
-  top: 38%;
+  top: 40%;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 8%;
+  gap: 6%;
 }
 
-/* ✅ リール（少し小さく） */
+/* ✅ リール（ちゃんと収まるサイズ） */
 .reel {
-  width: 120px;
-  height: 100px;
+  width: 110px;
+  height: 90px;
   overflow: hidden;
   background: white;
 
@@ -63,10 +63,10 @@ body {
   align-items: center;
 }
 
-/* ✅ 画像（小さく統一） */
+/* ✅ 画像（枠より少し小さく） */
 .reel-inner img {
-  width: 100px;
-  height: 100px;
+  width: 85px;
+  height: 85px;
   object-fit: contain;
 }
 
@@ -77,13 +77,13 @@ body {
 
 @keyframes spin {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-100px); }
+  100% { transform: translateY(-85px); }
 }
 
 /* ボタン */
 .spin-btn {
   position: absolute;
-  top: 65%;
+  top: 68%;
   left: 50%;
   transform: translateX(-50%);
   width: 55%;
@@ -152,7 +152,7 @@ function spinSlot(){
     reel.querySelector(".reel-inner").classList.add("spin");
   });
 
-  /* ✅ 順番停止復活 */
+  /* ✅ 順番停止（ここ重要） */
   setTimeout(()=>stopReel("r1"), 3000);
   setTimeout(()=>stopReel("r2"), 3500);
   setTimeout(()=>stopReel("r3"), 4200);
@@ -168,12 +168,14 @@ function createReel(){
   return html;
 }
 
-/* 停止 */
+/* 停止（1つずつ） */
 function stopReel(id){
   const reel = document.getElementById(id);
   const inner = reel.querySelector(".reel-inner");
 
-  inner.classList.remove("spin");
+  if(inner){
+    inner.classList.remove("spin");
+  }
 
   const index = Math.floor(Math.random()*images.length);
   results.push(index);
