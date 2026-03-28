@@ -33,14 +33,16 @@ body {
   gap: 10%;
 }
 
-/* 🎯 リール（高さ固定） */
+/* リール */
 .reel {
   width: 20vw;
-  max-width: 120px;
-  height: 80px;          /* ←ここ基準 */
-  overflow: hidden;
+  height: 20vw;
+  max-width: 150px;
+  max-height: 150px;
+  overflow: hidden; /* ←はみ出し防止 */
   background: white;
   display: flex;
+  align-items: center;
   justify-content: center;
 }
 
@@ -48,26 +50,23 @@ body {
 .reel-inner {
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
-/* 🎯 画像（高さ完全一致） */
+/* 画像 */
 .reel-inner img {
-  height: 80px;          /* ←reelと同じ */
-  width: auto;
-  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
 /* 回転 */
 .spin {
-  animation: spin 0.1s linear infinite;
+  animation: spin 0.2s linear infinite;
 }
 
-/* 🎯 アニメーション（高さと一致） */
 @keyframes spin {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-80px); }
+  100% { transform: translateY(-100%); }
 }
 
 /* ボタン */
@@ -120,7 +119,7 @@ const jackpotIndex = 2;
 let spinning = false;
 let results = [];
 
-/* 🎯 リール生成（高さ固定） */
+/* リール生成（縦サイズ固定でズレ防止） */
 function createReel(){
   let html = "";
   for(let i=0;i<10;i++){
@@ -130,10 +129,16 @@ function createReel(){
   return html;
 }
 
-/* 初期表示 */
+/* 初期表示（中央にピタッと1つだけ） */
 ["r1","r2","r3"].forEach(id=>{
-  document.getElementById(id).innerHTML =
-    `<div class="reel-inner">${createReel()}</div>`;
+  const reel = document.getElementById(id);
+  const index = Math.floor(Math.random()*images.length);
+
+  reel.innerHTML = `
+    <div class="reel-inner">
+      <img src="${images[index]}">
+    </div>
+  `;
 });
 
 /* 回す */
@@ -151,9 +156,9 @@ function spinSlot(){
     reel.querySelector(".reel-inner").classList.add("spin");
   });
 
-  setTimeout(()=>stopReel("r1"), 2000);
-  setTimeout(()=>stopReel("r2"), 2500);
-  setTimeout(()=>stopReel("r3"), 3000);
+  setTimeout(()=>stopReel("r1"), 3000);
+  setTimeout(()=>stopReel("r2"), 3500);
+  setTimeout(()=>stopReel("r3"), 4200);
 }
 
 /* 停止 */
@@ -181,11 +186,9 @@ function stopReel(id){
 
   results.push(index);
 
-  /* 🎯 完全にズレない構造 */
+  /* ←ここ超重要：1枚だけ表示（ズレ完全防止） */
   reel.innerHTML = `
     <div class="reel-inner">
-      <img src="${images[index]}">
-      <img src="${images[index]}">
       <img src="${images[index]}">
     </div>
   `;
