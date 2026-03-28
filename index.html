@@ -126,7 +126,7 @@ let results = [];
 
 const btn = document.getElementById("spinBtn");
 
-/* 音解放（無音） */
+/* 🔥 音解放（無音） */
 function unlockAudio(){
   const audio = new Audio("spin_full.mp3");
   audio.volume = 0;
@@ -134,19 +134,19 @@ function unlockAudio(){
 }
 document.body.addEventListener("touchstart", unlockAudio, { once: true });
 
-/* 回転音 */
+/* 🔥 回転音 */
 function playSpin(){
   const audio = new Audio("spin_full.mp3");
   audio.play().catch(()=>{});
 }
 
-/* 当たり音 */
+/* 🔥 当たり音 */
 function playSE(src){
   const audio = new Audio(src);
   audio.play().catch(()=>{});
 }
 
-/* ボタン沈む */
+/* 🔥 ボタン沈む */
 function pressButton(){
   btn.style.transform = "translateX(-50%) scale(0.9)";
   btn.style.filter = "brightness(0.8)";
@@ -182,6 +182,7 @@ function spinSlot(){
   if(spinning) return;
 
   pressButton();
+
   spinning = true;
   results = [];
   btn.classList.add("lock");
@@ -225,23 +226,25 @@ function stopReel(id){
   }
 }
 
-/* 判定＋当たり音 */
+/* 🎯 判定＋当たり音（修正済み） */
 function checkWin(){
   if(results[0] === results[1] && results[1] === results[2]){
 
     if(results[0] === jackpotIndex){
       showConfetti(180);
 
+      // 🌈 大当たり音
       setTimeout(()=>{
         playSE("bgm2.mp3");
-      },5200);
+      },500);
 
     } else {
       showConfetti(80);
 
+      // 🎉 通常当たり音
       setTimeout(()=>{
         playSE("bgm1.mp3");
-      },5200);
+      },500);
     }
 
   }
