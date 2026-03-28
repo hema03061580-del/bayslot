@@ -40,21 +40,24 @@ body {
 
 /* 🎯 リール */
 .reel {
-  width: 22%;
-  height: 90px;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* 🎯 中身 */
 .reel-inner {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 /* 🎯 画像 */
 .reel-inner img {
   width: 90%;
-  height: 90px;
+  height: auto;
+  max-height: 100%;
   object-fit: contain;
 }
 
