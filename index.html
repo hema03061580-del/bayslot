@@ -127,12 +127,14 @@ let fixedIndex = 0;
 
 const btn = document.getElementById("spinBtn");
 
-/* 🎵 事前ロード */
+/* 🎵 音 */
 const spinFull = new Audio("spin_full.mp3");
 const bgm1 = new Audio("bgm1.mp3");
 const bgm2 = new Audio("bgm2.mp3");
 
-/* 🔓 音解放（スマホ） */
+const SPIN_END = 6200;
+
+/* 🔓 音解放 */
 function unlockAudio(){
   [spinFull, bgm1, bgm2].forEach(a=>{
     a.volume = 0;
@@ -203,7 +205,6 @@ function spinSlot(){
   pressButton();
   btn.classList.add("lock");
 
-  /* 🎯 確率 */
   let rand = Math.random();
 
   if(rand < 0.1){
@@ -258,31 +259,43 @@ function stopReel(id){
   `;
 
   if(results.length === 3){
+
+    // 🔥 回転終了後にまとめて演出
     setTimeout(()=>{
-      checkWin();
       spinning = false;
       btn.classList.remove("lock");
+
+      setTimeout(()=>{
+        checkWin();
+      }, SPIN_END);
+
     },200);
   }
 }
 
-/* 🎯 判定（回転音終了に同期） */
+/* 🎯 判定 */
 function checkWin(){
 
   if(resultType === "jackpot"){
-    showConfetti(180);
+
+    setTimeout(()=>{
+      showConfetti(180);
+    },200);
 
     setTimeout(()=>{
       playBGM("jackpot");
-    },6200); // ←ここが同期ポイント
-
+    },400);
   }
+
   else if(resultType === "normal"){
-    showConfetti(80);
+
+    setTimeout(()=>{
+      showConfetti(80);
+    },200);
 
     setTimeout(()=>{
       playBGM("normal");
-    },6200);
+    },400);
   }
 }
 
