@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- フォント -->
+<link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+
 <style>
 body { margin:0; background:transparent; text-align:center; }
 
@@ -56,15 +59,40 @@ body { margin:0; background:transparent; text-align:center; }
   100% { transform:translateY(-60px); }
 }
 
+/* ボタン */
 .spin-btn {
   position:absolute;
   top:85%;
   left:50%;
   transform:translateX(-50%);
   width:60%;
+  transition: transform 0.1s, filter 0.1s;
 }
 
-.spin-btn.lock { opacity:0.5; }
+.spin-btn:active {
+  transform:translateX(-50%) scale(0.9);
+  filter:brightness(0.8);
+}
+
+.spin-btn.lock {
+  opacity:0.5;
+}
+
+/* 🔥 更新表示 */
+.update-msg {
+  position:absolute;
+  bottom:5%;
+  left:50%;
+  transform:translateX(-50%);
+  font-family:'Kosugi Maru', sans-serif;
+  font-size:20px;
+  color:#fff;
+  background:rgba(255,0,0,0.8);
+  padding:10px 20px;
+  border-radius:10px;
+  display:none;
+  z-index:999;
+}
 
 #confetti {
   position:absolute;
@@ -89,10 +117,28 @@ body { margin:0; background:transparent; text-align:center; }
 
   <img src="button.png" id="spinBtn" class="spin-btn" onclick="spinSlot()">
 
+  <div id="updateMsg" class="update-msg">
+    ⚠ 更新が必要です！
+  </div>
+
   <canvas id="confetti"></canvas>
 </div>
 
 <script>
+/* 🔥 バージョン管理 */
+const CURRENT_VERSION = "1.0";
+const REQUIRED_VERSION = "1.1";
+
+/* 🔥 更新チェック */
+const btn = document.getElementById("spinBtn");
+
+if(CURRENT_VERSION !== REQUIRED_VERSION){
+  document.getElementById("updateMsg").style.display = "block";
+  btn.style.pointerEvents = "none";
+}
+
+/* ===== 以下スロット ===== */
+
 const images = [
   "face1.png","face2.png","face3.png",
   "face4.png","face5.png","face6.png"
@@ -105,14 +151,12 @@ let results = [];
 let resultType = "";
 let fixedIndex = 0;
 
-const btn = document.getElementById("spinBtn");
-
 /* 🎵 音 */
 const spinFull = new Audio("spin_full.mp3");
 const bgm1 = new Audio("bgm1.mp3");
 const bgm2 = new Audio("bgm2.mp3");
 
-/* 🔓 スマホ音解放 */
+/* 🔓 音解放 */
 function unlockAudio(){
   [spinFull, bgm1, bgm2].forEach(a=>{
     a.volume = 0;
@@ -128,10 +172,6 @@ function playSpin(){
 }
 
 function playBGM(type){
-
-  // 🔥 回転音を止める（最重要）
-  spinFull.pause();
-
   bgm1.pause();
   bgm2.pause();
 
@@ -145,7 +185,7 @@ function playBGM(type){
   }
 }
 
-/* 初期表示 */
+/* 初期 */
 ["r1","r2","r3"].forEach(id=>{
   const i = Math.floor(Math.random()*images.length);
   document.getElementById(id).innerHTML = `
@@ -157,7 +197,7 @@ function playBGM(type){
   `;
 });
 
-/* リール生成 */
+/* リール */
 function createReel(){
   let html = "";
   for(let i=0;i<10;i++){
@@ -166,7 +206,7 @@ function createReel(){
   return html;
 }
 
-/* 🎰 回す */
+/* 回す */
 function spinSlot(){
   if(spinning) return;
 
@@ -175,7 +215,6 @@ function spinSlot(){
 
   btn.classList.add("lock");
 
-  /* 🎯 確率 */
   let rand = Math.random();
 
   if(rand < 0.1){
@@ -239,11 +278,11 @@ function stopReel(id){
   }
 }
 
-/* 🎯 判定 */
+/* 判定 */
 function checkWin(){
 
   if(resultType === "jackpot"){
-    showConfetti(80); // 軽量化
+    showConfetti(80);
     setTimeout(()=>{ playBGM("jackpot"); },700);
   }
 
@@ -253,7 +292,7 @@ function checkWin(){
   }
 }
 
-/* 🎊 紙吹雪（軽量＆確実に消える） */
+/* 紙吹雪 */
 function showConfetti(amount){
   const canvas = document.getElementById("confetti");
   const ctx = canvas.getContext("2d");
