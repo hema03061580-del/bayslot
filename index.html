@@ -129,12 +129,14 @@ const btn = document.getElementById("spinBtn");
 
 /* 🎵 音 */
 const spinFull = new Audio("spin_full.mp3");
-const bgm1 = new Audio("bgm1.mp3");
-const bgm2 = new Audio("bgm2.mp3");
+const bgm1 = new Audio("bgm1.mp3");     // 通常
+const bgm2 = new Audio("bgm2.MP3");     // 大当たり（大文字）
 
+/* タイミング */
 const SPIN_END = 6200;
+const BGM_DELAY = 500;
 
-/* 🔓 音解放 */
+/* 🔓 スマホ音解放 */
 function unlockAudio(){
   [spinFull, bgm1, bgm2].forEach(a=>{
     a.volume = 0;
@@ -164,7 +166,7 @@ function playBGM(type){
   }
 }
 
-/* ボタン */
+/* ボタン演出 */
 function pressButton(){
   btn.style.transform = "translateX(-50%) scale(0.9)";
   btn.style.filter = "brightness(0.8)";
@@ -259,15 +261,14 @@ function stopReel(id){
   `;
 
   if(results.length === 3){
-
-    // 🔥 回転終了後にまとめて演出
     setTimeout(()=>{
       spinning = false;
       btn.classList.remove("lock");
 
+      /* 🔥 回転終了 → 0.5秒後に演出 */
       setTimeout(()=>{
         checkWin();
-      }, SPIN_END);
+      }, SPIN_END + BGM_DELAY);
 
     },200);
   }
@@ -277,29 +278,17 @@ function stopReel(id){
 function checkWin(){
 
   if(resultType === "jackpot"){
-
-    setTimeout(()=>{
-      showConfetti(180);
-    },200);
-
-    setTimeout(()=>{
-      playBGM("jackpot");
-    },400);
+    showConfetti(180);
+    playBGM("jackpot");
   }
 
   else if(resultType === "normal"){
-
-    setTimeout(()=>{
-      showConfetti(80);
-    },200);
-
-    setTimeout(()=>{
-      playBGM("normal");
-    },400);
+    showConfetti(80);
+    playBGM("normal");
   }
 }
 
-/* 紙吹雪 */
+/* 🎉 紙吹雪 */
 function showConfetti(amount){
   const canvas = document.getElementById("confetti");
   const ctx = canvas.getContext("2d");
