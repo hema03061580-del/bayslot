@@ -5,88 +5,72 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
-  margin: 0;
-  background: transparent;
-  text-align: center;
-}
+body { margin:0; background:transparent; text-align:center; }
 
-.ui {
-  position: relative;
-  max-width: 900px;
-  margin: 0 auto;
-}
+.ui { position:relative; max-width:900px; margin:0 auto; }
 
-.bg { width: 100%; }
+.bg { width:100%; }
 
 .logo {
-  position: absolute;
-  top: -20%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 95%;
+  position:absolute;
+  top:-20%;
+  left:50%;
+  transform:translateX(-50%);
+  width:95%;
 }
 
 .slot {
-  position: absolute;
-  top: 37%;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 2px;
+  position:absolute;
+  top:37%;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:2px;
 }
 
 .reel {
-  width: 95px;
-  height: 62px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width:95px;
+  height:62px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 .reel-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
 
 .reel-inner img {
-  width: auto;
-  height: 60px;
-  object-fit: contain;
+  width:auto;
+  height:60px;
+  object-fit:contain;
 }
 
-/* 回転 */
-.spin {
-  animation: spin 0.08s linear infinite;
-}
+.spin { animation:spin 0.08s linear infinite; }
 
 @keyframes spin {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-60px); }
+  0% { transform:translateY(0); }
+  100% { transform:translateY(-60px); }
 }
 
-/* ボタン */
 .spin-btn {
-  position: absolute;
-  top: 85%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  transition: transform 0.1s;
+  position:absolute;
+  top:85%;
+  left:50%;
+  transform:translateX(-50%);
+  width:60%;
 }
 
-.spin-btn.lock {
-  opacity: 0.5;
-}
+.spin-btn.lock { opacity:0.5; }
 
-/* 紙吹雪 */
 #confetti {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
+  position:absolute;
+  top:0;
+  left:0;
+  pointer-events:none;
 }
 </style>
 </head>
@@ -118,6 +102,8 @@ const jackpotIndex = 2;
 
 let spinning = false;
 let results = [];
+let resultType = "";
+let fixedIndex = 0;
 
 const btn = document.getElementById("spinBtn");
 
@@ -135,7 +121,6 @@ function unlockAudio(){
 }
 document.body.addEventListener("touchstart", unlockAudio, { once: true });
 
-/* 再生 */
 function playSpin(){
   spinFull.currentTime = 0;
   spinFull.play().catch(()=>{});
@@ -151,15 +136,7 @@ function playBGM(type){
   }
 }
 
-/* ボタン */
-function pressButton(){
-  btn.style.transform = "translateX(-50%) scale(0.9)";
-  setTimeout(()=>{
-    btn.style.transform = "translateX(-50%) scale(1)";
-  },120);
-}
-
-/* 初期表示 */
+/* 初期 */
 ["r1","r2","r3"].forEach(id=>{
   const i = Math.floor(Math.random()*images.length);
   document.getElementById(id).innerHTML = `
@@ -187,10 +164,28 @@ function spinSlot(){
   spinning = true;
   results = [];
 
-  pressButton();
   btn.classList.add("lock");
 
-  setTimeout(()=>{ playSpin(); },80);
+  /* 🎯 内部抽選 */
+  let rand = Math.random();
+
+  if(rand < 0.1){
+    resultType = "jackpot";
+    fixedIndex = jackpotIndex;
+  }
+  else if(rand < 0.4){
+    resultType = "normal";
+
+    do{
+      fixedIndex = Math.floor(Math.random()*images.length);
+    } while(fixedIndex === jackpotIndex);
+
+  }
+  else{
+    resultType = "lose";
+  }
+
+  playSpin();
 
   setTimeout(()=>{
     ["r1","r2","r3"].forEach(id=>{
@@ -209,7 +204,13 @@ function spinSlot(){
 
 /* 停止 */
 function stopReel(id){
-  const index = Math.floor(Math.random()*images.length);
+  let index;
+
+  if(resultType === "lose"){
+    index = Math.floor(Math.random()*images.length);
+  } else {
+    index = fixedIndex;
+  }
 
   results.push(index);
 
@@ -230,25 +231,21 @@ function stopReel(id){
   }
 }
 
-/* 🎯 判定（ここが核心） */
+/* 判定 */
 function checkWin(){
 
-  if(results[0] === results[1] && results[1] === results[2]){
+  if(resultType === "jackpot"){
+    showConfetti(180);
+    setTimeout(()=>{ playBGM("jackpot"); },300);
+  }
 
-    if(results[0] === jackpotIndex){
-      // 🌈 大当たり（face3）
-      showConfetti(180);
-      setTimeout(()=>{ playBGM("jackpot"); },300);
-    } else {
-      // 🎉 通常当たり（それ以外）
-      showConfetti(80);
-      setTimeout(()=>{ playBGM("normal"); },300);
-    }
-
+  else if(resultType === "normal"){
+    showConfetti(80);
+    setTimeout(()=>{ playBGM("normal"); },300);
   }
 }
 
-/* 🎊 紙吹雪 */
+/* 紙吹雪 */
 function showConfetti(amount){
   const canvas = document.getElementById("confetti");
   const ctx = canvas.getContext("2d");
