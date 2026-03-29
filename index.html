@@ -19,6 +19,7 @@ body {
 
 .bg { width: 100%; }
 
+/* ロゴ */
 .logo {
   position: absolute;
   top: -20%;
@@ -27,18 +28,20 @@ body {
   width: 95%;
 }
 
+/* スロット */
 .slot {
   position: absolute;
   top: 37%;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 2px;
+  gap: 4px;
 }
 
+/* リール */
 .reel {
   width: 95px;
-  height: 62px;
+  height: 70px; /* 少し余裕 */
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -51,9 +54,11 @@ body {
   align-items: center;
 }
 
+/* 🔥 ここ修正（潰れ防止） */
 .reel-inner img {
-  width: 68px;
+  width: auto;
   height: 60px;
+  object-fit: contain;
 }
 
 /* 回転 */
@@ -73,11 +78,6 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: 60%;
-  transition: transform 0.1s, filter 0.1s;
-}
-
-.spin-btn.lock {
-  opacity: 0.5;
 }
 
 /* 紙吹雪 */
@@ -102,7 +102,7 @@ body {
     <div class="reel"><div id="r3"></div></div>
   </div>
 
-  <img src="button.png" id="spinBtn" class="spin-btn" onclick="spinSlot()">
+  <img src="button.png" onclick="spinSlot()" class="spin-btn">
 
   <canvas id="confetti"></canvas>
 </div>
@@ -113,37 +113,43 @@ const images = [
   "face4.png","face5.png","face6.png"
 ];
 
-const jackpotIndex = 2;
-
 let spinning = false;
 let results = [];
-
 let resultType = "";
 let fixedIndex = 0;
-let alreadyPlayed = false; // 🔥 これが超重要
 
-const btn = document.getElementById("spinBtn");
+/* 🔥 音（グローバル保持） */
+let bgm1 = new Audio("bgm1.mp3");
+let bgm2 = new Audio("bgm2.MP3");
+let spinFull = new Audio("spin_full.mp3");
 
-/* 🔊 音（確実1回だけ） */
+/* 🔥 音解放（超重要） */
+function unlockAudio(){
+  [bgm1,bgm2,spinFull].forEach(a=>{
+    a.play().then(()=>a.pause()).catch(()=>{});
+    a.currentTime = 0;
+  });
+}
+document.body.addEventListener("touchstart", unlockAudio, { once: true });
+
+/* 再生 */
 function playSpin(){
-  new Audio("spin_full.mp3").play().catch(()=>{});
+  spinFull.currentTime = 0;
+  spinFull.play().catch(()=>{});
 }
 
 function playBGM(type){
+  bgm1.pause();
+  bgm2.pause();
+
   if(type === "normal"){
-    new Audio("bgm1.mp3").play().catch(()=>{});
+    bgm1.currentTime = 0;
+    bgm1.play().catch(()=>{});
   }
   else if(type === "jackpot"){
-    new Audio("bgm2.MP3").play().catch(()=>{});
+    bgm2.currentTime = 0;
+    bgm2.play().catch(()=>{});
   }
-}
-
-/* ボタン */
-function pressButton(){
-  btn.style.transform = "translateX(-50%) scale(0.9)";
-  setTimeout(()=>{
-    btn.style.transform = "translateX(-50%) scale(1)";
-  },120);
 }
 
 /* 初期表示 */
@@ -167,18 +173,13 @@ function createReel(){
   return html;
 }
 
-/* 🎰 回す */
+/* 回す */
 function spinSlot(){
   if(spinning) return;
 
   spinning = true;
   results = [];
-  alreadyPlayed = false; // 🔥 リセット
 
-  pressButton();
-  btn.classList.add("lock");
-
-  // 🎯 抽選
   let rand = Math.random();
 
   if(rand < 0.1){
@@ -205,7 +206,7 @@ function spinSlot(){
         </div>
       `;
     });
-  },230);
+  },200);
 
   setTimeout(()=>stopReel("r1"), 3000);
   setTimeout(()=>stopReel("r2"), 3500);
@@ -235,29 +236,20 @@ function stopReel(id){
   if(results.length === 3){
     setTimeout(()=>{
       spinning = false;
-      btn.classList.remove("lock");
 
-      // 🔥 1回だけ発動
-      if(!alreadyPlayed){
-        alreadyPlayed = true;
+      // 🔥 確実に鳴る位置
+      checkWin();
 
-        setTimeout(()=>{
-          checkWin();
-        },600); // ←中間タイミング
-      }
-
-    },200);
+    },500);
   }
 }
 
-/* 🎯 判定（絶対ズレない） */
+/* 判定 */
 function checkWin(){
-
   if(resultType === "jackpot"){
     playBGM("jackpot");
-    showConfetti(180);
+    showConfetti(150);
   }
-
   else if(resultType === "normal"){
     playBGM("normal");
     showConfetti(80);
@@ -298,8 +290,6 @@ function showConfetti(amount){
 
     if(frame < 60){
       requestAnimationFrame(draw);
-    } else {
-      ctx.clearRect(0,0,canvas.width,canvas.height);
     }
   }
 
