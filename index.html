@@ -132,7 +132,7 @@ const spinFull = new Audio("spin_full.mp3");
 const bgm1 = new Audio("bgm1.mp3");
 const bgm2 = new Audio("bgm2.mp3");
 
-/* 🔓 音解放 */
+/* 🔓 音解放（スマホ） */
 function unlockAudio(){
   [spinFull, bgm1, bgm2].forEach(a=>{
     a.volume = 0;
@@ -149,16 +149,20 @@ function playSpin(){
 }
 
 function playBGM(type){
+  bgm1.pause();
+  bgm2.pause();
+
   if(type === "normal"){
     bgm1.currentTime = 0;
     bgm1.play().catch(()=>{});
-  } else if(type === "jackpot"){
+  }
+  else if(type === "jackpot"){
     bgm2.currentTime = 0;
     bgm2.play().catch(()=>{});
   }
 }
 
-/* 🔘 ボタン */
+/* ボタン */
 function pressButton(){
   btn.style.transform = "translateX(-50%) scale(0.9)";
   btn.style.filter = "brightness(0.8)";
@@ -199,24 +203,24 @@ function spinSlot(){
   pressButton();
   btn.classList.add("lock");
 
-  /* 🎯 確率抽選 */
+  /* 🎯 確率 */
   let rand = Math.random();
 
   if(rand < 0.1){
-    resultType = "jackpot"; // 10%
+    resultType = "jackpot";
   }
   else if(rand < 0.3){
-    resultType = "normal"; // 20%
+    resultType = "normal";
   }
   else{
-    resultType = "lose"; // 70%
+    resultType = "lose";
   }
 
   if(resultType !== "lose"){
     fixedIndex = Math.floor(Math.random()*images.length);
   }
 
-  setTimeout(()=>{ playSpin(); },80);
+  playSpin();
 
   setTimeout(()=>{
     ["r1","r2","r3"].forEach(id=>{
@@ -262,19 +266,27 @@ function stopReel(id){
   }
 }
 
-/* 🎯 判定 */
+/* 🎯 判定（回転音終了に同期） */
 function checkWin(){
+
   if(resultType === "jackpot"){
     showConfetti(180);
-    setTimeout(()=>{ playBGM("jackpot"); },300);
+
+    setTimeout(()=>{
+      playBGM("jackpot");
+    },6200); // ←ここが同期ポイント
+
   }
   else if(resultType === "normal"){
     showConfetti(80);
-    setTimeout(()=>{ playBGM("normal"); },300);
+
+    setTimeout(()=>{
+      playBGM("normal");
+    },6200);
   }
 }
 
-/* 🎊 紙吹雪 */
+/* 紙吹雪 */
 function showConfetti(amount){
   const canvas = document.getElementById("confetti");
   const ctx = canvas.getContext("2d");
