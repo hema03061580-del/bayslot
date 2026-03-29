@@ -117,12 +117,14 @@ const jackpotIndex = 2;
 
 let spinning = false;
 let results = [];
+
 let resultType = "";
 let fixedIndex = 0;
+let alreadyPlayed = false; // 🔥 これが超重要
 
 const btn = document.getElementById("spinBtn");
 
-/* 🔊 音（毎回新規で再生＝バグ防止） */
+/* 🔊 音（確実1回だけ） */
 function playSpin(){
   new Audio("spin_full.mp3").play().catch(()=>{});
 }
@@ -144,7 +146,7 @@ function pressButton(){
   },120);
 }
 
-/* 初期 */
+/* 初期表示 */
 ["r1","r2","r3"].forEach(id=>{
   const i = Math.floor(Math.random()*images.length);
   document.getElementById(id).innerHTML = `
@@ -171,6 +173,7 @@ function spinSlot(){
 
   spinning = true;
   results = [];
+  alreadyPlayed = false; // 🔥 リセット
 
   pressButton();
   btn.classList.add("lock");
@@ -234,16 +237,20 @@ function stopReel(id){
       spinning = false;
       btn.classList.remove("lock");
 
-      /* 🔥 少し遅らせる */
-      setTimeout(()=>{
-        checkWin();
-      }, 700);
+      // 🔥 1回だけ発動
+      if(!alreadyPlayed){
+        alreadyPlayed = true;
+
+        setTimeout(()=>{
+          checkWin();
+        },600); // ←中間タイミング
+      }
 
     },200);
   }
 }
 
-/* 🎯 判定（絶対にズレない） */
+/* 🎯 判定（絶対ズレない） */
 function checkWin(){
 
   if(resultType === "jackpot"){
